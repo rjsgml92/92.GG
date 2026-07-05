@@ -7,69 +7,138 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #f8f6f2; color: #1a1a1a; }
+        body { font-family: 'Pretendard', sans-serif; background-color: #f0ede6; color: #1a1a1a; }
+        .guide-section { transition: all 0.3s ease; }
+        .guide-section:hover { transform: translateX(5px); }
+        .img-placeholder {
+            background: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
+            border: 2px dashed #cbd5e1;
+        }
     </style>
 </head>
-<body class="antialiased min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-3xl w-full bg-white p-10 rounded-2xl shadow-sm border border-stone-200">
-        <h1 class="text-3xl font-black text-stone-900 mb-8 tracking-tight text-center">전적 분석 가이드</h1>
+<body class="antialiased min-h-screen py-20 px-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl font-black text-stone-900 mb-4 tracking-tight">전적 분석 가이드</h1>
+            <p class="text-stone-500 font-medium">GG.92의 데이터 지표를 통해 당신의 실력을 객관적으로 분석하세요.</p>
+        </div>
         
-        <div class="space-y-10 text-stone-600 leading-relaxed">
+        <div class="space-y-12">
             <!-- KDA 섹션 -->
-            <section class="border-b border-stone-100 pb-8">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xs font-bold bg-stone-800 text-white px-2 py-0.5 rounded">KDA</span>
-                    <h2 class="text-xl font-bold text-stone-800">킬-데스-어시스트</h2>
+            <div class="guide-section bg-white p-8 rounded-3xl shadow-sm border border-stone-200 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="order-2 md:order-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-xs font-bold bg-blue-600 text-white px-2 py-0.5 rounded">KDA</span>
+                        <h2 class="text-2xl font-bold text-stone-800">킬-데스-어시스트</h2>
+                    </div>
+                    <p class="text-stone-600 leading-relaxed mb-6 text-sm">
+                        KDA는 챔피언의 생존 능력과 전투 기여도를 나타내는 가장 직관적인 지표입니다. 단순히 킬을 많이 하는 것보다, 적은 데스로 많은 기여를 하는 것이 중요합니다.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">3.0 이상:</span> 안정적인 경기 운영과 높은 기여도를 의미합니다.</p>
+                        </div>
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">1.0 미만:</span> 잦은 데스로 인해 상대에게 성장 기회를 많이 제공했습니다.</p>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-sm">KDA는 챔피언의 생존 능력과 전투 기여도를 나타내는 가장 직관적인 지표입니다. <br>
-                <span class="text-stone-400 text-xs">(계산법: (킬 + 어시스트) ÷ 데스)</span></p>
-                <ul class="mt-3 space-y-2 text-xs text-stone-500">
-                    <li>• <span class="font-semibold text-stone-700">3.0 이상:</span> 팀 내에서 1인분 이상의 역할을 수행하며 안정적인 경기를 펼쳤음을 의미합니다.</li>
-                    <li>• <span class="font-semibold text-stone-700">1.0 미만:</span> 데스가 많아 상대 팀에게 성장 골드를 많이 제공했음을 나타냅니다.</li>
-                </ul>
-            </section>
+                <div class="order-1 md:order-2">
+                    <div class="relative group">
+                        <img src="guide-kda.png" alt="KDA 지표 위치" class="w-full rounded-xl shadow-inner border border-stone-100 object-cover aspect-video bg-stone-100" onerror="this.src='https://via.placeholder.com/600x300?text=KDA+Screenshot+Here'">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl"></div>
+                    </div>
+                    <p class="text-center text-[10px] text-stone-400 mt-2">전적 카드 내 KDA 수치 영역</p>
+                </div>
+            </div>
 
             <!-- CS 섹션 -->
-            <section class="border-b border-stone-100 pb-8">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xs font-bold bg-stone-800 text-white px-2 py-0.5 rounded">CS</span>
-                    <h2 class="text-xl font-bold text-stone-800">분당 CS</h2>
+            <div class="guide-section bg-white p-8 rounded-3xl shadow-sm border border-stone-200 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="relative group">
+                    <img src="guide-cs.png" alt="CS 지표 위치" class="w-full rounded-xl shadow-inner border border-stone-100 object-cover aspect-video bg-stone-100" onerror="this.src='https://via.placeholder.com/600x300?text=CS+Screenshot+Here'">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl"></div>
                 </div>
-                <p class="text-sm">CS(Creep Score)는 미니언 처치 수를 의미하며, 챔피언의 성장을 판단하는 핵심 지표입니다.</p>
-                <ul class="mt-3 space-y-2 text-xs text-stone-500">
-                    <li>• <span class="font-semibold text-stone-700">분당 8.0 이상:</span> 매우 효율적인 파밍을 통해 빠른 성장을 이루었음을 의미합니다.</li>
-                    <li>• <span class="font-semibold text-stone-700">분당 5.0 미만:</strong> 파밍 효율이 낮아 아이템 성장 속도가 상대적으로 느릴 수 있습니다.</li>
-                </ul>
-            </section>
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-xs font-bold bg-stone-800 text-white px-2 py-0.5 rounded">CS</span>
+                        <h2 class="text-2xl font-bold text-stone-800">분당 CS</h2>
+                    </div>
+                    <p class="text-stone-600 leading-relaxed mb-6 text-sm">
+                        CS(Creep Score)는 미니언 처치 수를 의미하며, 챔피언의 성장을 판단하는 핵심 지표입니다. 성장은 곧 아이템의 격차로 이어집니다.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-stone-800 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">분당 8.0 이상:</span> 최상위권 파밍 효율을 보여주며 빠른 성장을 이룬 상태입니다.</p>
+                        </div>
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-stone-300 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">분당 5.0 미만:</strong> 파밍 부족으로 인한 성장 지연이 발생했을 가능성이 큽니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 시야 점수 섹션 -->
-            <section class="border-b border-stone-100 pb-8">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xs font-bold bg-stone-800 text-white px-2 py-0.5 rounded">Vision</span>
-                    <h2 class="text-xl font-bold text-stone-800">시야 점수</h2>
+            <div class="guide-section bg-white p-8 rounded-3xl shadow-sm border border-stone-200 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="order-2 md:order-1">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-xs font-bold bg-amber-500 text-white px-2 py-0.5 rounded">Vision</span>
+                        <h2 class="text-2xl font-bold text-stone-800">시야 점수</h2>
+                    </div>
+                    <p class="text-stone-600 leading-relaxed mb-6 text-sm">
+                        와드 설치 및 제거를 통해 얻은 점수입니다. 팀의 운영 능력과 맵 장악력을 보여주는 매우 중요한 지표입니다.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">높은 점수:</span> 적극적인 시야 확보로 팀의 안정성을 높이고 갱킹을 방어했습니다.</p>
+                        </div>
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-stone-300 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">낮은 점수:</span> 시야 부족으로 인해 팀이 위험에 노출되었을 확률이 높습니다.</p>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-sm">와드 설치, 제거 및 시야 확보를 통해 얻은 점수로, 팀의 운영 기여도를 나타냅니다.</p>
-                <ul class="mt-3 space-y-2 text-xs text-stone-500">
-                    <li>• <span class="font-semibold text-stone-700">높은 점수:</span> 맵 장악력이 높고, 갱킹 방지 및 오브젝트 확보에 기여했음을 의미합니다.</li>
-                    <li>• <span class="font-semibold text-stone-700">낮은 점수:</span> 시야 확보 부족으로 인해 예상치 못한 습격에 취약했을 가능성이 큽니다.</li>
-                </ul>
-            </section>
+                <div class="order-1 md:order-2">
+                    <div class="relative group">
+                        <img src="guide-vision.png" alt="시야 점수 지표 위치" class="w-full rounded-xl shadow-inner border border-stone-100 object-cover aspect-video bg-stone-100" onerror="this.src='https://via.placeholder.com/600x300?text=Vision+Screenshot+Here'">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl"></div>
+                    </div>
+                    <p class="text-center text-[10px] text-stone-400 mt-2">전적 카드 내 시야 점수 영역</p>
+                </div>
+            </div>
 
             <!-- 피해량 섹션 -->
-            <section>
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="text-xs font-bold bg-stone-800 text-white px-2 py-0.5 rounded">Damage</span>
-                    <h2 class="text-xl font-bold text-stone-800">챔피언 가한 피해량</h2>
+            <div class="guide-section bg-white p-8 rounded-3xl shadow-sm border border-stone-200 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="relative group">
+                    <img src="guide-damage.png" alt="피해량 지표 위치" class="w-full rounded-xl shadow-inner border border-stone-100 object-cover aspect-video bg-stone-100" onerror="this.src='https://via.placeholder.com/600x300?text=Damage+Screenshot+Here'">
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors rounded-xl"></div>
                 </div>
-                <p class="text-sm">전투 중 적 챔피언에게 입힌 총 피해량으로, 실질적인 딜링 기여도를 측정합니다.</p>
-                <ul class="mt-3 space-y-2 text-xs text-stone-500">
-                    <li>• <span class="font-semibold text-stone-700">상위권 피해량:</span> 교전 시 주도적인 역할을 수행하며 상대 딜러에게 위협이 되었음을 의미합니다.</li>
-                </ul>
-            </section>
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-xs font-bold bg-red-600 text-white px-2 py-0.5 rounded">Damage</span>
+                        <h2 class="text-2xl font-bold text-stone-800">챔피언 가한 피해량</h2>
+                    </div>
+                    <p class="text-stone-600 leading-relaxed mb-6 text-sm">
+                        전투 중 적 챔피언에게 입힌 총 피해량입니다. 딜러 포지션의 경우 실제 딜링 기여도를 측정하는 핵심 지표가 됩니다.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 text-xs">
+                            <div class="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0"></div>
+                            <p class="text-stone-500"><span class="font-bold text-stone-800">상위권 피해량:</span> 교전 시 주도적인 딜링을 통해 상대 팀을 압박했음을 의미합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="mt-10 pt-6 border-t border-stone-100 text-center">
-            <a href="index.html" class="text-sm font-bold text-stone-400 hover:text-stone-800 transition-colors">← 메인으로 돌아가기</a>
+        <div class="mt-20 pt-10 border-t border-stone-200 text-center">
+            <a href="index.html" class="inline-flex items-center gap-2 text-sm font-bold text-stone-400 hover:text-stone-800 transition-colors">
+                <span>← 메인으로 돌아가기</span>
+            </a>
         </div>
     </div>
 </body>
