@@ -11,7 +11,7 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
         body {
-            font-family: 'Pretendard', sans-serif;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
             background-color: #f0ede6;
             color: #1a1a1a;
             background-image: url('background.png');
@@ -19,19 +19,22 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .modern-card {
             background-color: rgba(255, 253, 250, 0.95);
             border: 1px solid rgba(0, 0, 0, 0.06);
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03), 0 1px 4px rgba(0, 0, 0, 0.02);
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
         }
 
         .modern-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
             border-color: rgba(0, 0, 0, 0.1);
         }
 
@@ -76,12 +79,12 @@
             <h1 class="text-2xl font-black tracking-tighter cursor-pointer text-stone-900" onclick="location.reload()">
                 GG<span class="text-win">.</span>92
             </h1>
-            <span class="text-xs font-bold tracking-widest text-stone-400 uppercase">Pro Analytics</span>
+            <span class="text-[10px] font-bold tracking-[0.2em] text-stone-400 uppercase">Pro Analytics</span>
         </div>
     </nav>
 
     <header class="max-w-7xl mx-auto pt-16 px-4 text-center">
-        <h2 class="text-2xl font-medium tracking-tight text-stone-800 mb-8">GG.92에서 당신의 전적을 확인하세요! 🚀</h2>
+        <h2 class="text-2xl font-semibold tracking-tight text-stone-800 mb-8">GG.92에서 당신의 전적을 확인하세요! 🚀</h2>
 
         <div
             class="flex max-w-xl mx-auto bg-white rounded-lg border-2 border-stone-200 overflow-hidden shadow-sm transition-all focus-within:border-stone-800 focus-within:shadow-md mb-4">
@@ -98,20 +101,8 @@
             </button>
         </div>
 
-        <div id="recentSearches" class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs mb-6">
+        <div id="recentSearches" class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs mb-12">
             <!-- 최근 검색어가 여기에 동적으로 추가됩니다 -->
-        </div>
-
-        <div class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs">
-            <span class="text-stone-500 font-semibold mr-1">추천 검색:</span>
-            <button onclick="quickSearch('Hide on bush#KR1')"
-                class="px-3 py-1.5 bg-white border border-stone-200 rounded-md text-stone-600 font-medium hover:border-stone-400 hover:text-stone-900 transition-colors shadow-sm">
-                Faker #KR1
-            </button>
-            <button onclick="quickSearch('거니92#KR1')"
-                class="px-3 py-1.5 bg-white border border-stone-200 rounded-md text-stone-600 font-medium hover:border-stone-400 hover:text-stone-900 transition-colors shadow-sm">
-                거니92 #KR1
-            </button>
         </div>
     </header>
 
