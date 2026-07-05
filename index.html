@@ -84,13 +84,22 @@
         <h2 class="text-2xl font-medium tracking-tight text-stone-800 mb-8">GG.92에서 당신의 전적을 확인하세요! 🚀</h2>
 
         <div
-            class="flex max-w-lg mx-auto bg-white rounded-lg border-2 border-stone-200 overflow-hidden shadow-sm transition-all focus-within:border-stone-800 focus-within:shadow-md mb-6">
-            <input type="text" id="summonerName" placeholder="소환사명#태그 입력 (예: Hide on bush#KR1)"
+            class="flex max-w-xl mx-auto bg-white rounded-lg border-2 border-stone-200 overflow-hidden shadow-sm transition-all focus-within:border-stone-800 focus-within:shadow-md mb-4">
+            <input type="text" id="summonerName" placeholder="소환사명 입력"
                 class="w-full bg-transparent px-5 py-3.5 text-base focus:outline-none placeholder-stone-400 font-medium text-stone-900">
+            <div class="flex items-center px-3 bg-stone-50 border-l border-stone-200">
+                <span class="text-stone-400 font-bold text-sm mr-1">#</span>
+                <input type="text" id="tagLineInput" value="KR1"
+                    class="w-20 bg-transparent py-3.5 text-base focus:outline-none placeholder-stone-400 font-medium text-stone-900 text-center">
+            </div>
             <button onclick="fetchMatchHistory()"
                 class="text-xs font-bold tracking-wider text-white bg-stone-800 hover:bg-stone-900 px-8 transition-colors">
                 SEARCH
             </button>
+        </div>
+
+        <div id="recentSearches" class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs mb-6">
+            <!-- 최근 검색어가 여기에 동적으로 추가됩니다 -->
         </div>
 
         <div class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs">
@@ -172,22 +181,63 @@
     </main>
 
     <script>
+        // 🕒 최근 검색어 관리 기능
+        function saveRecentSearch(name, tag) {
+            let recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+            const searchId = `${name}#${tag}`;
+            
+            // 중복 제거 후 맨 앞으로 이동
+            recent = recent.filter(item => item !== searchId);
+            recent.unshift(searchId);
+            
+            // 최대 5개까지만 저장
+            if (recent.length > 5) recent.pop();
+            
+            localStorage.setItem('recentSearches', JSON.stringify(recent));
+            renderRecentSearches();
+        }
+
+        function renderRecentSearches() {
+            const container = document.getElementById('recentSearches');
+            const recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+            
+            container.innerHTML = '';
+            recent.forEach(searchId => {
+                const btn = document.createElement('button');
+                btn.className = 'px-3 py-1.5 bg-white border border-stone-200 rounded-md text-stone-600 font-medium hover:border-stone-400 hover:text-stone-900 transition-colors shadow-sm';
+                btn.innerText = searchId;
+                btn.onclick = () => quickSearch(searchId);
+                container.appendChild(btn);
+            });
+        }
+
+        // 페이지 로드 시 실행
+        window.onload = renderRecentSearches;
+
         function quickSearch(target) {
-            document.getElementById('summonerName').value = target;
+            const [name, tag] = target.split('#');
+            document.getElementById('summonerName').value = name;
+            document.getElementById('tagLineInput').value = tag;
             fetchMatchHistory();
         }
 
         async function fetchMatchHistory() {
-            const input = document.getElementById('summonerName');
+            const nameInput = document.getElementById('summonerName');
+            const tagInput = document.getElementById('tagLineInput');
             const main = document.getElementById('mainContent');
             const skeleton = document.getElementById('skeletonLoading');
 
-            if (!input.value.includes('#')) {
-                alert('닉네임#태그 형태로 입력해 주세요.');
+            const name = nameInput.value.trim();
+            const tag = tagInput.value.trim();
+
+            if (!name) {
+                alert('소환사명을 입력해 주세요.');
                 return;
             }
-
-            const [name, tag] = input.value.split('#');
+            if (!tag) {
+                alert('태그를 입력해 주세요.');
+                return;
+            }
 
             main.classList.add('hidden');
             skeleton.classList.remove('hidden');
@@ -201,6 +251,9 @@
                     skeleton.classList.add('hidden');
                     return;
                 }
+
+                // 성공 시 최근 검색어에 저장
+                saveRecentSearch(name, tag);
 
                 document.getElementById('profileIcon').src = data.profile.profileIconUrl;
                 document.getElementById('summonerLevel').innerText = `LV.${data.profile.summonerLevel}`;
