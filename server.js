@@ -100,6 +100,23 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
                     const finalItemOrder = [...normalItems, myData.item6];
                     const queueId = matchDetail.data.info.queueId;
                     const gameModeRaw = matchDetail.data.info.gameMode;
+
+                    // 👥 1:1 비교를 위한 매치 전체 참가자 데이터 매핑
+                    const participants = matchDetail.data.info.participants.map(p => ({
+                        gameName: p.riotIdGameName || p.summonerName,
+                        tagLine: p.riotIdTagline || "KR1",
+                        championName: p.championName,
+                        championImageUrl: `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/champion/${p.championName}.png`,
+                        kills: p.kills,
+                        deaths: p.deaths,
+                        assists: p.assists,
+                        kda: ((p.kills + p.assists) / (p.deaths || 1)).toFixed(2),
+                        totalDamageDealtToChampions: p.totalDamageDealtToChampions,
+                        goldEarned: p.goldEarned,
+                        totalMinionsKilled: p.totalMinionsKilled + p.neutralMinionsKilled,
+                        visionScore: p.visionScore,
+                        win: p.win
+                    }));
                     
                     return {
                         matchId: matchId,
@@ -117,7 +134,8 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
                         goldEarned: myData.goldEarned,
                         totalMinionsKilled: myData.totalMinionsKilled + myData.neutralMinionsKilled,
                         visionScore: myData.visionScore,
-                        itemIds: finalItemOrder
+                        itemIds: finalItemOrder,
+                        participants: participants
                     };
                 } catch (e) {
                     return { matchId: matchId, error: "매치 로드 실패" };

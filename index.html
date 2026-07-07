@@ -336,41 +336,111 @@
                     }
 
                    
-                    // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인
+                    // 👥 1:1 비교를 위한 매치 데이터 전역 저장 및 블루/레드 팀 아이콘 생성
+                    window.matchData = window.matchData || {};
+                    window.matchData[match.matchId] = {
+                        my: {
+                            championName: match.championName,
+                            championImageUrl: match.championImageUrl,
+                            totalDamageDealtToChampions: match.totalDamageDealtToChampions,
+                            totalMinionsKilled: match.totalMinionsKilled,
+                            goldEarned: match.goldEarned,
+                            kills: match.kills,
+                            deaths: match.deaths,
+                            assists: match.assists
+                        },
+                        participants: match.participants
+                    };
+
+                    let blueTeamHtml = '';
+                    let redTeamHtml = '';
+
+                    (match.participants || []).forEach((p, idx) => {
+                        const isBlue = idx < 5;
+                        const imgHtml = `
+                            <button onclick="compareParticipant('${match.matchId}', ${idx}, this)" 
+                                    class="w-8 h-8 rounded-full border border-stone-200 overflow-hidden hover:border-stone-800 transition-all shrink-0 p-0.5 bg-white relative group compare-btn-${match.matchId}">
+                                <img src="${p.championImageUrl}" class="w-full h-full rounded-full object-cover">
+                                <span class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-stone-900 text-white text-[9px] px-1.5 py-0.5 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap mb-1 z-50">
+                                    ${p.gameName}
+                                </span>
+                            </button>
+                        `;
+                        if (isBlue) {
+                            blueTeamHtml += imgHtml;
+                        } else {
+                            redTeamHtml += imgHtml;
+                        }
+                    });
+                   
+                    // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인 (클릭 시 1:1 비교 영역 확장)
                     const card = `
-                        <div class="modern-card p-2 flex items-center justify-start gap-1 relative overflow-hidden md:min-h-[120px]">
-                            <div class="absolute top-0 left-0 w-1.5 h-full ${badgeClass}"></div>
+                        <div class="modern-card relative overflow-hidden transition-all duration-300">
+                            <!-- 메인 카드 정보 (클릭 시 비교 토글) -->
+                            <div onclick="toggleCompareArea('${match.matchId}')" class="p-2.5 flex items-center justify-start gap-1 cursor-pointer md:min-h-[120px] hover:bg-stone-50/40 relative">
+                                <div class="absolute top-0 left-0 w-1.5 h-full ${badgeClass}"></div>
 
-                            <div class="flex items-center gap-3.5 w-[160px] pl-2 shrink-0">
-                                <img src="${match.championImageUrl}" class="w-16 h-16 rounded-full object-cover border border-stone-200 shadow-sm">
-                                <div class="leading-tight">
-                                    <div class="text-base font-extrabold ${isWin ? 'text-win' : 'text-lose'}">${winLabel}</div>
-                                    <div class="text-xs text-stone-400 font-bold mt-1">${displayMode} · ${durationMin}분</div>
+                                <div class="flex items-center gap-3.5 w-[160px] pl-2 shrink-0">
+                                    <img src="${match.championImageUrl}" class="w-16 h-16 rounded-full object-cover border border-stone-200 shadow-sm">
+                                    <div class="leading-tight">
+                                        <div class="text-base font-extrabold ${isWin ? 'text-win' : 'text-lose'}">${winLabel}</div>
+                                        <div class="text-xs text-stone-400 font-bold mt-1">${displayMode} · ${durationMin}분</div>
+                                    </div>
+                                </div>
+
+                                <div class="w-[130px] shrink-0 flex flex-col justify-center leading-tight">
+                                    <div class="text-base font-black text-stone-800 tracking-tight">
+                                        ${match.kills} / <span class="text-lose">${match.deaths}</span> / ${match.assists}
+                                    </div>
+                                    <div class="flex items-center gap-1.5 mt-1">
+                                        <span class="text-xs font-bold text-stone-500">${match.kda} 평점</span>
+                                        ${performanceBadge}
+                                    </div>
+                                </div>
+
+                                <div class="w-[90px] hidden sm:block shrink-0 leading-tight">
+                                    <div class="text-xs font-bold text-stone-700">CS ${match.totalMinionsKilled} <span class="text-stone-400 font-normal">(${csPerMin})</span></div>
+                                    <div class="text-xs text-stone-400 font-medium mt-1">시야 지수 ${match.visionScore}</div>
+                                </div>
+
+                                <div class="w-[90px] hidden md:block shrink-0 leading-tight">
+                                    <div class="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">가한 피해량</div>
+                                    <div class="text-xs font-black text-stone-700 mt-0.5">${match.totalDamageDealtToChampions.toLocaleString()}</div>
+                                </div>
+
+                                <div class="flex justify-start items-center gap-0.5 bg-stone-100 rounded-lg p-1 border border-stone-200/60 shrink-0 min-w-[250px] ml-auto">
+                                    ${itemHtml}
+                                </div>
+
+                                <!-- 비교 토글 아이콘 및 텍스트 -->
+                                <div class="flex flex-col items-center justify-center px-3 text-stone-400 hover:text-stone-800 ml-3 shrink-0 self-stretch border-l border-stone-200/60">
+                                    <span class="text-[9px] font-black uppercase tracking-wider mb-0.5">비교</span>
+                                    <svg id="chevron-${match.matchId}" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
 
-                            <div class="w-[130px] shrink-0 flex flex-col justify-center leading-tight">
-                                <div class="text-base font-black text-stone-800 tracking-tight">
-                                    ${match.kills} / <span class="text-lose">${match.deaths}</span> / ${match.assists}
+                            <!-- 1:1 비교 영역 (숨김 상태) -->
+                            <div id="compare-area-${match.matchId}" class="hidden border-t border-stone-200/50 bg-[#faf9f6]/80 p-4 transition-all">
+                                <div class="flex flex-col lg:flex-row gap-4 items-center justify-between mb-4">
+                                    <!-- 블루팀 -->
+                                    <div class="flex items-center gap-1">
+                                        <span class="text-[10px] font-black text-blue-500 tracking-wider mr-2 uppercase">BLUE</span>
+                                        <div class="flex gap-1.5">${blueTeamHtml}</div>
+                                    </div>
+                                    
+                                    <span class="text-[10px] font-black text-stone-300 uppercase">VS</span>
+                                    
+                                    <!-- 레드팀 -->
+                                    <div class="flex items-center gap-1">
+                                        <div class="flex gap-1.5">${redTeamHtml}</div>
+                                        <span class="text-[10px] font-black text-red-500 tracking-wider ml-2 uppercase">RED</span>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-1.5 mt-1">
-                                    <span class="text-xs font-bold text-stone-500">${match.kda} 평점</span>
-                                    ${performanceBadge}
+                                
+                                <!-- 1:1 비교 스탯 영역 (챔피언 클릭 시 오픈) -->
+                                <div id="compare-stats-${match.matchId}" class="bg-white rounded-xl border border-stone-200/60 p-4 hidden animate-fade-in">
+                                    <!-- 동적으로 스탯 대조 바가 렌더링됩니다 -->
                                 </div>
-                            </div>
-
-                            <div class="w-[90px] hidden sm:block shrink-0 leading-tight">
-                                <div class="text-xs font-bold text-stone-700">CS ${match.totalMinionsKilled} <span class="text-stone-400 font-normal">(${csPerMin})</span></div>
-                                <div class="text-xs text-stone-400 font-medium mt-1">시야 지수 ${match.visionScore}</div>
-                            </div>
-
-                            <div class="w-[90px] hidden md:block shrink-0 leading-tight">
-                                <div class="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">가한 피해량</div>
-                                <div class="text-xs font-black text-stone-700 mt-0.5">${match.totalDamageDealtToChampions.toLocaleString()}</div>
-                            </div>
-
-                            <div class="flex justify-start items-center gap-0.5 bg-stone-100 rounded-lg p-1 border border-stone-200/60 ml-auto shrink-0 min-w-[250px]">
-                                ${itemHtml}
                             </div>
                         </div>
                     `;
@@ -385,6 +455,121 @@
             alert('데이터 요청에 실패했습니다.');
             skeleton.classList.add('hidden');
         }
+        }
+
+        // 📊 1:1 비교 인터랙션 스크립트
+        function toggleCompareArea(matchId) {
+            const area = document.getElementById(`compare-area-${matchId}`);
+            const chevron = document.getElementById(`chevron-${matchId}`);
+            if (area.classList.contains('hidden')) {
+                area.classList.remove('hidden');
+                chevron.classList.add('rotate-180');
+            } else {
+                area.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
+            }
+        }
+
+        function compareParticipant(matchId, pIdx, btn) {
+            // 이벤트 전파 방지 (카드가 닫히지 않도록 함)
+            event.stopPropagation();
+            
+            // 동일 매치 카드 내 다른 버튼들의 하이라이트 초기화
+            const buttons = document.querySelectorAll(`.compare-btn-${matchId}`);
+            buttons.forEach(b => b.classList.remove('border-stone-800', 'ring-2', 'ring-stone-400'));
+            
+            // 현재 클릭한 버튼 하이라이트
+            btn.classList.add('border-stone-800', 'ring-2', 'ring-stone-400');
+            
+            const statsArea = document.getElementById(`compare-stats-${matchId}`);
+            const data = window.matchData[matchId];
+            const my = data.my;
+            const target = data.participants[pIdx];
+            
+            // 비율 계산 (프로그레스 바 너비 설정용)
+            const totalDmg = my.totalDamageDealtToChampions + target.totalDamageDealtToChampions;
+            const myDmgPct = totalDmg === 0 ? 50 : (my.totalDamageDealtToChampions / totalDmg) * 100;
+            const targetDmgPct = totalDmg === 0 ? 50 : (target.totalDamageDealtToChampions / totalDmg) * 100;
+            
+            const totalCs = my.totalMinionsKilled + target.totalMinionsKilled;
+            const myCsPct = totalCs === 0 ? 50 : (my.totalMinionsKilled / totalCs) * 100;
+            const targetCsPct = totalCs === 0 ? 50 : (target.totalMinionsKilled / totalCs) * 100;
+            
+            const totalGold = my.goldEarned + target.goldEarned;
+            const myGoldPct = totalGold === 0 ? 50 : (my.goldEarned / totalGold) * 100;
+            const targetGoldPct = totalGold === 0 ? 50 : (target.goldEarned / totalGold) * 100;
+            
+            statsArea.innerHTML = `
+                <div class="space-y-4">
+                    <!-- 헤더 영역 -->
+                    <div class="flex justify-between items-center pb-2.5 border-b border-stone-100">
+                        <div class="flex items-center gap-2">
+                            <img src="${my.championImageUrl}" class="w-7 h-7 rounded-full object-cover border border-stone-200">
+                            <span class="text-xs font-black text-stone-800">나 (${my.championName})</span>
+                        </div>
+                        <span class="text-[10px] font-black text-stone-300 uppercase tracking-widest">1:1 VS</span>
+                        <div class="flex items-center gap-2 flex-row-reverse">
+                            <img src="${target.championImageUrl}" class="w-7 h-7 rounded-full object-cover border border-stone-200">
+                            <span class="text-xs font-black text-stone-800">${target.gameName} (${target.championName})</span>
+                        </div>
+                    </div>
+
+                    <!-- KDA 비교 -->
+                    <div class="flex justify-between items-center text-xs">
+                        <div class="text-stone-700 font-extrabold leading-tight">
+                            <div class="text-[10px] text-stone-400 font-bold uppercase mb-0.5">나의 KDA</div>
+                            ${my.kills} / <span class="text-lose">${my.deaths}</span> / ${my.assists}
+                            <div class="text-[10px] text-stone-400 font-medium mt-0.5">평점: ${((my.kills + my.assists) / (my.deaths || 1)).toFixed(2)}</div>
+                        </div>
+                        <span class="text-[10px] font-black text-stone-400 tracking-wider">KDA</span>
+                        <div class="text-right text-stone-700 font-extrabold leading-tight">
+                            <div class="text-[10px] text-stone-400 font-bold uppercase mb-0.5">상대 KDA</div>
+                            ${target.kills} / <span class="text-lose">${target.deaths}</span> / ${target.assists}
+                            <div class="text-[10px] text-stone-400 font-medium mt-0.5">평점: ${target.kda}</div>
+                        </div>
+                    </div>
+
+                    <!-- 피해량 비교 -->
+                    <div>
+                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
+                            <span>${my.totalDamageDealtToChampions.toLocaleString()}</span>
+                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">가한 피해량</span>
+                            <span>${target.totalDamageDealtToChampions.toLocaleString()}</span>
+                        </div>
+                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
+                            <div class="bg-[#2b5fe6]" style="width: ${myDmgPct}%"></div>
+                            <div class="bg-stone-800 ml-auto" style="width: ${targetDmgPct}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- CS 비교 -->
+                    <div>
+                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
+                            <span>${my.totalMinionsKilled} CS</span>
+                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">CS</span>
+                            <span>${target.totalMinionsKilled} CS</span>
+                        </div>
+                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
+                            <div class="bg-[#2b5fe6]" style="width: ${myCsPct}%"></div>
+                            <div class="bg-stone-800 ml-auto" style="width: ${targetCsPct}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 골드 비교 -->
+                    <div>
+                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
+                            <span>${my.goldEarned.toLocaleString()} G</span>
+                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">획득 골드</span>
+                            <span>${target.goldEarned.toLocaleString()} G</span>
+                        </div>
+                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
+                            <div class="bg-[#2b5fe6]" style="width: ${myGoldPct}%"></div>
+                            <div class="bg-stone-800 ml-auto" style="width: ${targetGoldPct}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            statsArea.classList.remove('hidden');
         }
     </script>
 </body>
