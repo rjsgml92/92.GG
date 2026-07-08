@@ -23,7 +23,9 @@ function getLaneGroup(participant) {
     return normalizeLane(
         participant?.individualPosition ||
         participant?.teamPosition ||
-        participant?.lane
+        participant?.lane ||
+        participant?.position ||
+        participant?.role
     );
 }
 
@@ -54,6 +56,36 @@ function buildLaneSnapshot(participants, frameParticipantFrames) {
     }, { gold: 0, cs: 0, kills: 0, deaths: 0, assists: 0, names: [] });
 }
 
+function buildParticipantSnapshot(participant, frameParticipantFrames) {
+    const frame = frameParticipantFrames?.[String(participant.participantId)] || {};
+    const cs = frame.minionsKilled ?? participant.totalMinionsKilled ?? 0;
+    const neutralCs = frame.neutralMinionsKilled ?? frame.jungleMinionsKilled ?? participant.neutralMinionsKilled ?? 0;
+    const gold = frame.totalGold ?? participant.goldEarned ?? 0;
+
+    return {
+        participantId: participant.participantId,
+        teamId: participant.teamId,
+        laneGroup: getLaneGroup(participant),
+        name: participant.riotIdGameName || participant.summonerName || participant.championName,
+        championName: participant.championName,
+        gold,
+        cs: cs + neutralCs,
+        kills: participant.kills ?? 0,
+        deaths: participant.deaths ?? 0,
+        assists: participant.assists ?? 0
+    };
+}
+
+function compareLaneSnapshots(mySnapshot, enemySnapshot) {
+    const goldDiff = mySnapshot.gold - enemySnapshot.gold;
+    const csDiff = mySnapshot.cs - enemySnapshot.cs;
+    const score = goldDiff + (csDiff * 20);
+
+    if (score > 120) return { result: "WIN", label: "승리", score, goldDiff, csDiff };
+    if (score < -120) return { result: "LOSE", label: "패배", score, goldDiff, csDiff };
+    return { result: "EVEN", label: "비김", score, goldDiff, csDiff };
+}
+
 function getLaneVerdict(myLane, enemyLane) {
     const goldDiff = myLane.gold - enemyLane.gold;
     const csDiff = myLane.cs - enemyLane.cs;
@@ -65,28 +97,6 @@ function getLaneVerdict(myLane, enemyLane) {
 }
 
 async function fetchLaneAnalysis(matchId, myParticipant, allParticipants) {
-    const myLaneGroup = getLaneGroup(myParticipant);
-    if (myLaneGroup === "NONE") {
-        return {
-            laneGroup: "NONE",
-            result: "UNKNOWN",
-            label: "판정 불가",
-            detail: "포지션 정보를 찾을 수 없습니다."
-        };
-    }
-
-    const allies = allParticipants.filter(p => p.teamId === myParticipant.teamId && getLaneGroup(p) === myLaneGroup);
-    const enemies = allParticipants.filter(p => p.teamId !== myParticipant.teamId && getLaneGroup(p) === myLaneGroup);
-
-    if (!allies.length || !enemies.length) {
-        return {
-            laneGroup: myLaneGroup,
-            result: "UNKNOWN",
-            label: "판정 불가",
-            detail: `${formatLaneLabel(myLaneGroup)} 상대를 찾지 못했습니다.`
-        };
-    }
-
     let frameParticipantFrames = null;
     try {
         const timelineUrl = `https://asia.api.riotgames.com/lol/match/v5/matches/${matchId}/timeline?api_key=${RIOT_API_KEY}`;
@@ -98,19 +108,74 @@ async function fetchLaneAnalysis(matchId, myParticipant, allParticipants) {
         frameParticipantFrames = null;
     }
 
-    const myLane = buildLaneSnapshot(allies, frameParticipantFrames);
-    const enemyLane = buildLaneSnapshot(enemies, frameParticipantFrames);
-    const verdict = getLaneVerdict(myLane, enemyLane);
+    const participantSnapshots = allParticipants.map(participant => buildParticipantSnapshot(participant, frameParticipantFrames));
+    const mySnapshot = participantSnapshots.find(p => p.participantId === myParticipant.participantId);
+
+    if (!mySnapshot) {
+        return {
+            laneGroup: "UNKNOWN",
+            result: "UNKNOWN",
+            label: "판정 불가",
+            detail: "내 참가자 정보를 찾지 못했습니다."
+        };
+    }
+
+    const directLaneGroup = mySnapshot.laneGroup;
+    let myLane;
+    let enemyLane;
+    let laneGroup = directLaneGroup;
+    let usingFallback = false;
+
+    if (directLaneGroup !== "NONE") {
+        const allies = participantSnapshots.filter(p => p.teamId === mySnapshot.teamId && p.laneGroup === directLaneGroup);
+        const enemies = participantSnapshots.filter(p => p.teamId !== mySnapshot.teamId && p.laneGroup === directLaneGroup);
+
+        if (allies.length && enemies.length) {
+            myLane = buildLaneSnapshot(allies, frameParticipantFrames);
+            enemyLane = buildLaneSnapshot(enemies, frameParticipantFrames);
+        }
+    }
+
+    if (!myLane || !enemyLane) {
+        usingFallback = true;
+        laneGroup = directLaneGroup === "NONE" ? "UNKNOWN" : directLaneGroup;
+        const enemyCandidates = participantSnapshots.filter(p => p.teamId !== mySnapshot.teamId);
+        if (!enemyCandidates.length) {
+            return {
+                laneGroup,
+                result: "UNKNOWN",
+                label: "판정 불가",
+                detail: "상대 팀 참가자 정보를 찾지 못했습니다.",
+                goldDiff: 0,
+                csDiff: 0,
+                myTeamNames: [],
+                enemyTeamNames: []
+            };
+        }
+        const opponent = enemyCandidates.reduce((best, candidate) => {
+            if (!best) return candidate;
+            const bestScore = Math.abs((mySnapshot.gold - best.gold)) + Math.abs((mySnapshot.cs - best.cs) * 20);
+            const candidateScore = Math.abs((mySnapshot.gold - candidate.gold)) + Math.abs((mySnapshot.cs - candidate.cs) * 20);
+            return candidateScore < bestScore ? candidate : best;
+        }, null);
+
+        myLane = mySnapshot;
+        enemyLane = opponent;
+    }
+
+    const verdict = compareLaneSnapshots(myLane, enemyLane);
+    const laneName = directLaneGroup !== "NONE" ? formatLaneLabel(directLaneGroup) : "상대";
+    const detailPrefix = usingFallback ? "추정" : "기준";
 
     return {
-        laneGroup: myLaneGroup,
+        laneGroup,
         result: verdict.result,
         label: verdict.label,
-        detail: `${formatLaneLabel(myLaneGroup)} 기준 ${myLane.gold.toLocaleString()}G / ${myLane.cs}CS vs ${enemyLane.gold.toLocaleString()}G / ${enemyLane.cs}CS`,
+        detail: `${laneName} ${detailPrefix} ${myLane.gold.toLocaleString()}G / ${myLane.cs}CS vs ${enemyLane.gold.toLocaleString()}G / ${enemyLane.cs}CS`,
         goldDiff: verdict.goldDiff,
         csDiff: verdict.csDiff,
-        myTeamNames: allies.map(p => p.riotIdGameName || p.summonerName || p.championName),
-        enemyTeamNames: enemies.map(p => p.riotIdGameName || p.summonerName || p.championName)
+        myTeamNames: [],
+        enemyTeamNames: []
     };
 }
 
