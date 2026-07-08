@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="c41YoKPWMam_7IdCzFuxMiKz8w0Rv7_o5L-gilWWgWM" />
     <meta name="naver-site-verification" content="d48e5f3dba3e1be0317affa7548a7d220d0f1e53" />
-    <title>GG.92 | 미니멀 전적 검색</title>
+    <title>GG.92 | 미니멀 ?�적 검??/title>
     <link rel="shortcut icon" href="#">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" as="style" crossorigin
@@ -86,11 +86,11 @@
     </nav>
 
     <header class="max-w-7xl mx-auto pt-16 px-4 text-center">
-        <h2 class="text-2xl font-semibold tracking-tight text-stone-800 mb-8">GG.92에서 당신의 전적을 확인하세요! 🚀</h2>
+        <h2 class="text-2xl font-semibold tracking-tight text-stone-800 mb-8">GG.92?�서 ?�신???�적???�인?�세?? ??</h2>
 
         <div
             class="flex max-w-xl mx-auto bg-white rounded-lg border-2 border-stone-200 overflow-hidden shadow-sm transition-all focus-within:border-stone-800 focus-within:shadow-md mb-4">
-            <input type="text" id="summonerName" placeholder="소환사명 입력"
+            <input type="text" id="summonerName" placeholder="?�환?�명 ?�력"
                 class="w-full bg-transparent px-5 py-3.5 text-base focus:outline-none placeholder-stone-400 font-medium text-stone-900">
             <div class="flex items-center px-3 bg-stone-50 border-l border-stone-200">
                 <span class="text-stone-400 font-bold text-sm mr-1">#</span>
@@ -104,7 +104,7 @@
         </div>
 
         <div id="recentSearches" class="flex flex-wrap items-center justify-center gap-2 max-w-md mx-auto text-xs mb-12">
-            <!-- 최근 검색어가 여기에 동적으로 추가됩니다 -->
+            <!-- 최근 검?�어가 ?�기???�적?�로 추�??�니??-->
         </div>
     </header>
 
@@ -127,7 +127,7 @@
                         class="w-20 h-20 rounded-2xl object-cover border-2 border-stone-200 shadow-md">
                     <div>
                         <div class="flex flex-wrap items-baseline gap-x-2 mb-1.5">
-                            <h3 id="gameName" class="text-2xl font-extrabold text-stone-900 tracking-tight">소환사명</h3>
+                            <h3 id="gameName" class="text-2xl font-extrabold text-stone-900 tracking-tight">?�환?�명</h3>
                             <span id="tagLine" class="text-sm text-stone-400 font-bold">#TAG</span>
                         </div>
                         <div id="summonerLevel"
@@ -142,12 +142,12 @@
                         <img id="tierIcon" src="" class="w-16 h-16 object-contain" alt="Tier Icon">
                         <div>
                             <div id="tierLabel" class="text-xl font-black text-stone-900 tracking-tight">UNRANKED</div>
-                            <div id="winLossDetail" class="text-sm text-stone-500 font-semibold mt-0.5">0승 0패</div>
+                            <div id="winLossDetail" class="text-sm text-stone-500 font-semibold mt-0.5">0??0??/div>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between mt-5 pt-4 border-t border-stone-100">
-                        <span class="text-sm text-stone-400 font-bold">종합 승률</span>
+                        <span class="text-sm text-stone-400 font-bold">종합 ?�률</span>
                         <span id="winRateChart" class="text-sm font-black text-win">0%</span>
                     </div>
                 </div>
@@ -165,9 +165,9 @@
                         </div>
                     </div>
                     <div class="text-right border-l border-stone-200 pl-6">
-                        <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">평균 KDA</div>
+                        <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-1">?�균 KDA</div>
                         <div id="summaryKda" class="text-xl font-extrabold text-stone-900">0.0 / 0.0 / 0.0</div>
-                        <div id="summaryKdaRatio" class="text-sm font-bold text-stone-600 mt-1">0.00:1 평점</div>
+                        <div id="summaryKdaRatio" class="text-sm font-bold text-stone-600 mt-1">0.00:1 ?�점</div>
                     </div>
                 </div>
 
@@ -178,23 +178,22 @@
     </main>
 
     <footer class="fixed bottom-6 left-0 right-0 text-center space-x-4">
-        <a href="guide.html" class="text-[10px] font-medium text-stone-400 opacity-60 hover:opacity-100 transition-opacity duration-300">전적 분석 가이드</a>
-        <a href="privacy.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">개인정보처리방침</a>
-        <a href="terms.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">이용약관</a>
+        <a href="guide.html" class="text-[10px] font-medium text-stone-400 opacity-60 hover:opacity-100 transition-opacity duration-300">?�적 분석 가?�드</a>
+        <a href="privacy.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">개인?�보처리방침</a>
+        <a href="terms.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">?�용?��?</a>
     </footer>
 
     <script>
-        // 🕒 최근 검색어 관리 기능
+        // ?�� 최근 검?�어 관�?기능
         function saveRecentSearch(name, tag) {
             let recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
             const searchId = `${name}#${tag}`;
             
-            // 중복 제거 후 맨 앞으로 이동
+            // 중복 ?�거 ??�??�으�??�동
             recent = recent.filter(item => item !== searchId);
             recent.unshift(searchId);
             
-            // 최대 5개까지만 저장
-            if (recent.length > 5) recent.pop();
+            // 최�? 5개까지�??�??            if (recent.length > 5) recent.pop();
             
             localStorage.setItem('recentSearches', JSON.stringify(recent));
             renderRecentSearches();
@@ -214,7 +213,7 @@
             });
         }
 
-        // 페이지 로드 시 실행
+        // ?�이지 로드 ???�행
         window.onload = renderRecentSearches;
 
         function quickSearch(target) {
@@ -232,10 +231,10 @@
         }
 
         function getLaneResultText(result) {
-            if (result === 'WIN') return '승리';
-            if (result === 'LOSE') return '패배';
-            if (result === 'EVEN') return '비김';
-            return '판정 불가';
+            if (result === 'WIN') return '?�리';
+            if (result === 'LOSE') return '?�배';
+            if (result === 'EVEN') return '비�?';
+            return '?�정 불�?';
         }
 
         async function fetchMatchHistory() {
@@ -248,11 +247,11 @@
             const tag = tagInput.value.trim();
 
             if (!name) {
-                alert('소환사명을 입력해 주세요.');
+                alert('?�환?�명???�력??주세??');
                 return;
             }
             if (!tag) {
-                alert('태그를 입력해 주세요.');
+                alert('?�그�??�력??주세??');
                 return;
             }
 
@@ -269,8 +268,7 @@
                     return;
                 }
 
-                // 성공 시 최근 검색어에 저장
-                saveRecentSearch(name, tag);
+                // ?�공 ??최근 검?�어???�??                saveRecentSearch(name, tag);
 
                 document.getElementById('profileIcon').src = data.profile.profileIconUrl;
                 document.getElementById('summonerLevel').innerText = `LV.${data.profile.summonerLevel}`;
@@ -283,7 +281,7 @@
 
                 document.getElementById('tierLabel').innerText = `${rank.tier || 'UNRANKED'} ${rank.rank || ''}`.trim();
                 document.getElementById('winRateChart').innerText = rank.winRate || '0%';
-                document.getElementById('winLossDetail').innerText = rank.wins ? `${rank.wins}승 ${rank.losses}패` : '전적 없음';
+                document.getElementById('winLossDetail').innerText = rank.wins ? `${rank.wins}??${rank.losses}?? : '?�적 ?�음';
 
                 const tierImg = document.getElementById('tierIcon');
                 if (tierFirstWord === 'unranked') {
@@ -311,7 +309,7 @@
                 document.getElementById('summaryLosses').innerText = `${totalMatches - tWins}L`;
                 document.getElementById('summaryWinRate').innerText = `(${Math.round((tWins / totalMatches) * 100)}%)`;
                 document.getElementById('summaryKda').innerHTML = `${avgKills} / <span class="text-lose">${avgDeaths}</span> / ${avgAssists}`;
-                document.getElementById('summaryKdaRatio').innerHTML = `<span class="${parseFloat(totalKdaRatio) >= 3.0 ? 'text-win' : ''}">${totalKdaRatio}:1 평점</span>`;
+                document.getElementById('summaryKdaRatio').innerHTML = `<span class="${parseFloat(totalKdaRatio) >= 3.0 ? 'text-win' : ''}">${totalKdaRatio}:1 ?�점</span>`;
 
                 const list = document.getElementById('historyList');
                 list.innerHTML = '';
@@ -319,29 +317,29 @@
                 data.history.forEach(match => {
                     const isWin = match.win;
                     const badgeClass = isWin ? 'badge-win' : 'badge-lose';
-                    const winLabel = isWin ? '승리' : '패배';
+                    const winLabel = isWin ? '?�리' : '?�배';
                     const durationMin = Math.floor(match.gameDuration / 60);
                     const csPerMin = (match.totalMinionsKilled / durationMin).toFixed(1);
 
-                    // 🏆 KDA 3.5 이상 캐리 배지 시스템 적용
+                    // ?�� KDA 3.5 ?�상 캐리 배�? ?�스???�용
                     const numericKda = parseFloat(match.kda);
-                    let performanceBadge = `<span class="text-xs text-stone-400 font-bold">무난함</span>`;
+                    let performanceBadge = `<span class="text-xs text-stone-400 font-bold">무난??/span>`;
                     if (numericKda >= 3.5 && isWin) {
                         performanceBadge = `<span class="bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-black tracking-wide">CARRY</span>`;
                     } else if (numericKda < 2.0) {
-                        performanceBadge = `<span class="text-xs text-stone-400/70 font-medium">아쉬움</span>`;
+                        performanceBadge = `<span class="text-xs text-stone-400/70 font-medium">?�쉬?�</span>`;
                     }
 
-                    const displayMode = match.gameMode === 'CLASSIC' ? '일반' : match.gameMode;
+                    const displayMode = match.gameMode === 'CLASSIC' ? '?�반' : match.gameMode;
 
                     let itemHtml = '';
                     const rawItemIds = match.itemIds || [];
 
-                    // 💡 이 구문을 찾아서 아래 코드로 통째로 변경해 주세요!
+                    // ?�� ??구문??찾아???�래 코드�??�째�?변경해 주세??
                     for (let i = 0; i < 7; i++) {
                         const itemId = rawItemIds[i];
 
-                        // [변경 포인트]: onerror를 삭제하고, 데이터가 있을 때만 안전한 주소를 대입합니다.
+                        // [변�??�인??: onerror�???��?�고, ?�이?��? ?�을 ?�만 ?�전??주소�??�?�합?�다.
                         if (itemId && itemId !== 0) {
                             const opggItemUrl = `https://opgg-static.akamaized.net/meta/images/lol/latest/item/${itemId}.png`;
                             itemHtml += `
@@ -354,53 +352,13 @@
                     }
 
                    
-                    // 👥 1:1 비교를 위한 매치 데이터 전역 저장 및 블루/레드 팀 아이콘 생성
-                    window.matchData = window.matchData || {};
-                    window.matchData[match.matchId] = {
-                        my: {
-                            championName: match.championName,
-                            championImageUrl: match.championImageUrl,
-                            totalDamageDealtToChampions: match.totalDamageDealtToChampions,
-                            totalMinionsKilled: match.totalMinionsKilled,
-                            goldEarned: match.goldEarned,
-                            kills: match.kills,
-                            deaths: match.deaths,
-                            assists: match.assists
-                        },
-                        participants: match.participants,
-                        laneAnalysis: match.laneAnalysis
-                    };
-
-                    let blueTeamHtml = '';
-                    let redTeamHtml = '';
-
-                    (match.participants || []).forEach((p, idx) => {
-                        const isBlue = idx < 5;
-                        const imgHtml = `
-                            <button onclick="compareParticipant('${match.matchId}', ${idx}, this)" 
-                                    class="w-8 h-8 rounded-full border border-stone-200 overflow-hidden hover:border-stone-800 transition-all shrink-0 p-0.5 bg-white relative group compare-btn-${match.matchId}">
-                                <img src="${p.championImageUrl}" class="w-full h-full rounded-full object-cover">
-                                <span class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-stone-900 text-white text-[9px] px-1.5 py-0.5 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap mb-1 z-50">
-                                    ${p.gameName}
-                                </span>
-                            </button>
-                        `;
-                        if (isBlue) {
-                            blueTeamHtml += imgHtml;
-                        } else {
-                            redTeamHtml += imgHtml;
-                        }
-                    });
-                   
-                    // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인 (클릭 시 1:1 비교 영역 확장)
-                    const laneBadge = match.laneAnalysis
-                        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis.result)}">라인전 ${match.laneAnalysis.label}</span>`
-                        : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses('UNKNOWN')}">라인전 판정 불가</span>`;
+                    // ?�� ?�림 ?�적 카드 ?�자??                    const laneBadge = match.laneAnalysis
+                        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis.result)}">?�인??${match.laneAnalysis.label}</span>`
+                        : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses('UNKNOWN')}">?�인???�정 불�?</span>`;
 
                     const card = `
                         <div class="modern-card relative overflow-hidden transition-all duration-300">
-                            <!-- 메인 카드 정보 (클릭 시 비교 토글) -->
-                            <div onclick="toggleCompareArea('${match.matchId}')" class="p-2.5 flex items-center justify-start gap-1 cursor-pointer md:min-h-[120px] hover:bg-stone-50/40 relative">
+                            <div class="p-2.5 flex items-center justify-start gap-1 md:min-h-[120px] hover:bg-stone-50/40 relative">
                                 <div class="absolute top-0 left-0 w-1.5 h-full ${badgeClass}"></div>
 
                                 <div class="flex items-center gap-3.5 w-[160px] pl-2 shrink-0">
@@ -408,7 +366,7 @@
                                     <div class="leading-tight">
                                         <div class="mt-2">${laneBadge}</div>
                                         <div class="text-base font-extrabold ${isWin ? 'text-win' : 'text-lose'}">${winLabel}</div>
-                                        <div class="text-xs text-stone-400 font-bold mt-1">${displayMode} · ${durationMin}분</div>
+                                        <div class="text-xs text-stone-400 font-bold mt-1">${displayMode} · ${durationMin}�?/div>
                                     </div>
                                 </div>
 
@@ -417,64 +375,23 @@
                                         ${match.kills} / <span class="text-lose">${match.deaths}</span> / ${match.assists}
                                     </div>
                                     <div class="flex items-center gap-1.5 mt-1">
-                                        <span class="text-xs font-bold text-stone-500">${match.kda} 평점</span>
+                                        <span class="text-xs font-bold text-stone-500">${match.kda} KDA</span>
                                         ${performanceBadge}
                                     </div>
                                 </div>
 
                                 <div class="w-[90px] hidden sm:block shrink-0 leading-tight">
                                     <div class="text-xs font-bold text-stone-700">CS ${match.totalMinionsKilled} <span class="text-stone-400 font-normal">(${csPerMin})</span></div>
-                                    <div class="text-xs text-stone-400 font-medium mt-1">시야 지수 ${match.visionScore}</div>
+                                    <div class="text-xs text-stone-400 font-medium mt-1">?�야 ${match.visionScore}</div>
                                 </div>
 
                                 <div class="w-[90px] hidden md:block shrink-0 leading-tight">
-                                    <div class="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">가한 피해량</div>
+                                    <div class="text-[11px] text-stone-400 font-semibold uppercase tracking-wider">�??�해??/div>
                                     <div class="text-xs font-black text-stone-700 mt-0.5">${match.totalDamageDealtToChampions.toLocaleString()}</div>
                                 </div>
 
                                 <div class="flex justify-start items-center gap-0.5 bg-stone-100 rounded-lg p-1 border border-stone-200/60 shrink-0 min-w-[250px] ml-auto">
                                     ${itemHtml}
-                                </div>
-
-                                <!-- 비교 토글 아이콘 및 텍스트 -->
-                                <div class="flex flex-col items-center justify-center px-3 text-stone-400 hover:text-stone-800 ml-3 shrink-0 self-stretch border-l border-stone-200/60">
-                                    <span class="text-[9px] font-black uppercase tracking-wider mb-0.5">비교</span>
-                                    <svg id="chevron-${match.matchId}" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-
-                            <!-- 1:1 비교 영역 (숨김 상태) -->
-                            <div id="compare-area-${match.matchId}" class="hidden border-t border-stone-200/50 bg-[#faf9f6]/80 p-4 transition-all">
-                                ${match.laneAnalysis ? `
-                                <div class="mb-4 rounded-lg border ${getLaneResultClasses(match.laneAnalysis.result)} px-3 py-2">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <span class="text-[10px] font-black uppercase tracking-wider">라인전 결과</span>
-                                        <span class="text-[11px] font-black">${match.laneAnalysis.label}</span>
-                                    </div>
-                                    <div class="mt-1 text-xs font-medium text-stone-600">
-                                        ${match.laneAnalysis.detail}
-                                    </div>
-                                </div>
-                                ` : ''}
-                                <div class="flex flex-col lg:flex-row gap-4 items-center justify-between mb-4">
-                                    <!-- 블루팀 -->
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-[10px] font-black text-blue-500 tracking-wider mr-2 uppercase">BLUE</span>
-                                        <div class="flex gap-1.5">${blueTeamHtml}</div>
-                                    </div>
-                                    
-                                    <span class="text-[10px] font-black text-stone-300 uppercase">VS</span>
-                                    
-                                    <!-- 레드팀 -->
-                                    <div class="flex items-center gap-1">
-                                        <div class="flex gap-1.5">${redTeamHtml}</div>
-                                        <span class="text-[10px] font-black text-red-500 tracking-wider ml-2 uppercase">RED</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- 1:1 비교 스탯 영역 (챔피언 클릭 시 오픈) -->
-                                <div id="compare-stats-${match.matchId}" class="bg-white rounded-xl border border-stone-200/60 p-4 hidden animate-fade-in">
-                                    <!-- 동적으로 스탯 대조 바가 렌더링됩니다 -->
                                 </div>
                             </div>
                         </div>
@@ -487,137 +404,13 @@
 
         } catch (error) {
             console.error(error);
-            alert('데이터 요청에 실패했습니다.');
+            alert('?�이???�청???�패?�습?�다.');
             skeleton.classList.add('hidden');
         }
-        }
-
-        // 📊 1:1 비교 인터랙션 스크립트
-        function toggleCompareArea(matchId) {
-            const area = document.getElementById(`compare-area-${matchId}`);
-            const chevron = document.getElementById(`chevron-${matchId}`);
-            if (area.classList.contains('hidden')) {
-                area.classList.remove('hidden');
-                chevron.classList.add('rotate-180');
-            } else {
-                area.classList.add('hidden');
-                chevron.classList.remove('rotate-180');
-            }
-        }
-
-        function compareParticipant(matchId, pIdx, btn) {
-            // 이벤트 전파 방지 (카드가 닫히지 않도록 함)
-            event.stopPropagation();
-            
-            // 동일 매치 카드 내 다른 버튼들의 하이라이트 초기화
-            const buttons = document.querySelectorAll(`.compare-btn-${matchId}`);
-            buttons.forEach(b => b.classList.remove('border-stone-800', 'ring-2', 'ring-stone-400'));
-            
-            // 현재 클릭한 버튼 하이라이트
-            btn.classList.add('border-stone-800', 'ring-2', 'ring-stone-400');
-            
-            const statsArea = document.getElementById(`compare-stats-${matchId}`);
-            const data = window.matchData[matchId];
-            const my = data.my;
-            const target = data.participants[pIdx];
-            
-            // 비율 계산 (프로그레스 바 너비 설정용)
-            const totalDmg = my.totalDamageDealtToChampions + target.totalDamageDealtToChampions;
-            const myDmgPct = totalDmg === 0 ? 50 : (my.totalDamageDealtToChampions / totalDmg) * 100;
-            const targetDmgPct = totalDmg === 0 ? 50 : (target.totalDamageDealtToChampions / totalDmg) * 100;
-            
-            const totalCs = my.totalMinionsKilled + target.totalMinionsKilled;
-            const myCsPct = totalCs === 0 ? 50 : (my.totalMinionsKilled / totalCs) * 100;
-            const targetCsPct = totalCs === 0 ? 50 : (target.totalMinionsKilled / totalCs) * 100;
-            
-            const totalGold = my.goldEarned + target.goldEarned;
-            const myGoldPct = totalGold === 0 ? 50 : (my.goldEarned / totalGold) * 100;
-            const targetGoldPct = totalGold === 0 ? 50 : (target.goldEarned / totalGold) * 100;
-            const lanePanel = data.laneAnalysis ? `
-                    <div class="rounded-lg border ${getLaneResultClasses(data.laneAnalysis.result)} px-3 py-2">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[10px] font-black uppercase tracking-wider">라인전 결과</span>
-                            <span class="text-[11px] font-black">${data.laneAnalysis.label}</span>
-                        </div>
-                        <div class="mt-1 text-xs font-medium text-stone-600">
-                            ${data.laneAnalysis.detail}
-                        </div>
-                    </div>
-                ` : '';
-            
-            statsArea.innerHTML = `
-                <div class="space-y-4">
-                    ${lanePanel}
-                    <!-- 헤더 영역 -->
-                    <div class="flex justify-between items-center pb-2.5 border-b border-stone-100">
-                        <div class="flex items-center gap-2">
-                            <img src="${my.championImageUrl}" class="w-7 h-7 rounded-full object-cover border border-stone-200">
-                            <span class="text-xs font-black text-stone-800">나 (${my.championName})</span>
-                        </div>
-                        <span class="text-[10px] font-black text-stone-300 uppercase tracking-widest">1:1 VS</span>
-                        <div class="flex items-center gap-2 flex-row-reverse">
-                            <img src="${target.championImageUrl}" class="w-7 h-7 rounded-full object-cover border border-stone-200">
-                            <span class="text-xs font-black text-stone-800">${target.gameName} (${target.championName})</span>
-                        </div>
-                    </div>
-
-                    <!-- KDA 비교 -->
-                    <div class="flex justify-between items-center text-xs">
-                        <div class="text-stone-700 font-extrabold leading-tight">
-                            <div class="text-[10px] text-stone-400 font-bold uppercase mb-0.5">나의 KDA</div>
-                            ${my.kills} / <span class="text-lose">${my.deaths}</span> / ${my.assists}
-                            <div class="text-[10px] text-stone-400 font-medium mt-0.5">평점: ${((my.kills + my.assists) / (my.deaths || 1)).toFixed(2)}</div>
-                        </div>
-                        <span class="text-[10px] font-black text-stone-400 tracking-wider">KDA</span>
-                        <div class="text-right text-stone-700 font-extrabold leading-tight">
-                            <div class="text-[10px] text-stone-400 font-bold uppercase mb-0.5">상대 KDA</div>
-                            ${target.kills} / <span class="text-lose">${target.deaths}</span> / ${target.assists}
-                            <div class="text-[10px] text-stone-400 font-medium mt-0.5">평점: ${target.kda}</div>
-                        </div>
-                    </div>
-
-                    <!-- 피해량 비교 -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
-                            <span>${my.totalDamageDealtToChampions.toLocaleString()}</span>
-                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">가한 피해량</span>
-                            <span>${target.totalDamageDealtToChampions.toLocaleString()}</span>
-                        </div>
-                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
-                            <div class="bg-[#2b5fe6]" style="width: ${myDmgPct}%"></div>
-                            <div class="bg-stone-800 ml-auto" style="width: ${targetDmgPct}%"></div>
-                        </div>
-                    </div>
-
-                    <!-- CS 비교 -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
-                            <span>${my.totalMinionsKilled} CS</span>
-                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">CS</span>
-                            <span>${target.totalMinionsKilled} CS</span>
-                        </div>
-                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
-                            <div class="bg-[#2b5fe6]" style="width: ${myCsPct}%"></div>
-                            <div class="bg-stone-800 ml-auto" style="width: ${targetCsPct}%"></div>
-                        </div>
-                    </div>
-
-                    <!-- 골드 비교 -->
-                    <div>
-                        <div class="flex justify-between text-[11px] font-black text-stone-500 mb-1">
-                            <span>${my.goldEarned.toLocaleString()} G</span>
-                            <span class="text-stone-400 uppercase tracking-wider text-[10px]">획득 골드</span>
-                            <span>${target.goldEarned.toLocaleString()} G</span>
-                        </div>
-                        <div class="h-2 w-full bg-stone-100 rounded-full flex overflow-hidden">
-                            <div class="bg-[#2b5fe6]" style="width: ${myGoldPct}%"></div>
-                            <div class="bg-stone-800 ml-auto" style="width: ${targetGoldPct}%"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            statsArea.classList.remove('hidden');
         }
     </script>
 </body>
 </html>
+
+
+
