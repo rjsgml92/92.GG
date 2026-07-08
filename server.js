@@ -9,6 +9,111 @@ app.use(cors());
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
 const DDRAGON_VERSION = "14.22.1"; 
 
+function normalizeLane(position) {
+    const value = String(position || "").toUpperCase();
+
+    if (["TOP", "JUNGLE", "MIDDLE"].includes(value)) return value;
+    if (value === "MID") return "MIDDLE";
+    if (["BOTTOM", "UTILITY"].includes(value)) return "BOTTOM";
+
+    return "NONE";
+}
+
+function getLaneGroup(participant) {
+    return normalizeLane(
+        participant?.individualPosition ||
+        participant?.teamPosition ||
+        participant?.lane
+    );
+}
+
+function formatLaneLabel(laneGroup) {
+    switch (laneGroup) {
+        case "TOP": return "탑";
+        case "JUNGLE": return "정글";
+        case "MIDDLE": return "미드";
+        case "BOTTOM": return "봇";
+        default: return "라인";
+    }
+}
+
+function buildLaneSnapshot(participants, frameParticipantFrames) {
+    return participants.reduce((acc, participant) => {
+        const frame = frameParticipantFrames?.[String(participant.participantId)] || {};
+        const cs = frame.minionsKilled ?? participant.totalMinionsKilled ?? 0;
+        const neutralCs = frame.neutralMinionsKilled ?? frame.jungleMinionsKilled ?? participant.neutralMinionsKilled ?? 0;
+        const gold = frame.totalGold ?? participant.goldEarned ?? 0;
+
+        acc.gold += gold;
+        acc.cs += cs + neutralCs;
+        acc.kills += participant.kills ?? 0;
+        acc.deaths += participant.deaths ?? 0;
+        acc.assists += participant.assists ?? 0;
+        acc.names.push(participant.riotIdGameName || participant.summonerName || participant.championName);
+        return acc;
+    }, { gold: 0, cs: 0, kills: 0, deaths: 0, assists: 0, names: [] });
+}
+
+function getLaneVerdict(myLane, enemyLane) {
+    const goldDiff = myLane.gold - enemyLane.gold;
+    const csDiff = myLane.cs - enemyLane.cs;
+    const score = goldDiff + (csDiff * 20);
+
+    if (score > 120) return { result: "WIN", label: "승리", score, goldDiff, csDiff };
+    if (score < -120) return { result: "LOSE", label: "패배", score, goldDiff, csDiff };
+    return { result: "EVEN", label: "비김", score, goldDiff, csDiff };
+}
+
+async function fetchLaneAnalysis(matchId, myParticipant, allParticipants) {
+    const myLaneGroup = getLaneGroup(myParticipant);
+    if (myLaneGroup === "NONE") {
+        return {
+            laneGroup: "NONE",
+            result: "UNKNOWN",
+            label: "판정 불가",
+            detail: "포지션 정보를 찾을 수 없습니다."
+        };
+    }
+
+    const allies = allParticipants.filter(p => p.teamId === myParticipant.teamId && getLaneGroup(p) === myLaneGroup);
+    const enemies = allParticipants.filter(p => p.teamId !== myParticipant.teamId && getLaneGroup(p) === myLaneGroup);
+
+    if (!allies.length || !enemies.length) {
+        return {
+            laneGroup: myLaneGroup,
+            result: "UNKNOWN",
+            label: "판정 불가",
+            detail: `${formatLaneLabel(myLaneGroup)} 상대를 찾지 못했습니다.`
+        };
+    }
+
+    let frameParticipantFrames = null;
+    try {
+        const timelineUrl = `https://asia.api.riotgames.com/lol/match/v5/matches/${matchId}/timeline?api_key=${RIOT_API_KEY}`;
+        const timelineResponse = await axios.get(timelineUrl);
+        const frames = timelineResponse.data?.info?.frames || [];
+        const frame15 = frames.find(f => f.timestamp >= 900000) || frames[frames.length - 1];
+        frameParticipantFrames = frame15?.participantFrames || null;
+    } catch (e) {
+        frameParticipantFrames = null;
+    }
+
+    const myLane = buildLaneSnapshot(allies, frameParticipantFrames);
+    const enemyLane = buildLaneSnapshot(enemies, frameParticipantFrames);
+    const verdict = getLaneVerdict(myLane, enemyLane);
+
+    return {
+        laneGroup: myLaneGroup,
+        result: verdict.result,
+        label: verdict.label,
+        detail: `${formatLaneLabel(myLaneGroup)} 기준 ${myLane.gold.toLocaleString()}G / ${myLane.cs}CS vs ${enemyLane.gold.toLocaleString()}G / ${enemyLane.cs}CS`,
+        goldDiff: verdict.goldDiff,
+        csDiff: verdict.csDiff,
+        myTeamNames: allies.map(p => p.riotIdGameName || p.summonerName || p.championName),
+        enemyTeamNames: enemies.map(p => p.riotIdGameName || p.summonerName || p.championName)
+    };
+}
+
 // 🎮 게임 큐 ID별 매치 종류 한글 변환 함수
 function getQueueModeKr(queueId, gameMode) {
     switch(queueId) {
@@ -23,6 +128,53 @@ function getQueueModeKr(queueId, gameMode) {
             return gameMode;
     }
 }
+
+// 🔴 실시간 게임 상태 확인 API
+app.get('/api/live/:gameName/:tagLine', async (req, res) => {
+    try {
+        const gameName = encodeURIComponent(req.params.gameName);
+        const tagLine = encodeURIComponent(req.params.tagLine);
+        
+        const accountUrl = `https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${RIOT_API_KEY}`;
+        const accountResponse = await axios.get(accountUrl);
+        const puuid = accountResponse.data.puuid;
+
+        const specUrl = `https://kr.api.riotgames.com/lol/spectator/v4/active-games/by-summoner/${puuid}?api_key=${RIOT_API_KEY}`;
+        const specResponse = await axios.get(specUrl);
+        
+        res.json(specResponse.data);
+    } catch (e) {
+        res.status(e.response?.status || 500).json({ error: "현재 게임 중이 아니거나 정보를 가져올 수 없습니다." });
+    }
+});
+
+// 📈 라인전 승패 분석 API (Timeline 데이터 활용)
+app.get('/api/match/:matchId/timeline', async (req, res) => {
+    try {
+        const matchId = req.params.matchId;
+        const timelineUrl = `https://asia.api.riotgames.com/lol/match/v5/matches/${matchId}/timeline?api_key=${RIOT_API_KEY}`;
+        const response = await axios.get(timelineUrl);
+        const frames = response.data.info.frames;
+        
+        // 15분(900초) 시점의 프레임 찾기
+        const frame15 = frames.find(f => f.timestamp >= 900000) || frames[frames.length - 1];
+        const participantFrames = frame15.participantFrames;
+
+        // 각 플레이어의 15분 시점 스탯 추출
+        const laneStats = participantFrames.map(pf => ({
+            puuid: pf.puuid,
+            totalGold: pf.totalGold,
+            totalCs: pf.totalMinionsKilled + pf.neutralMinionsKilled
+        }));
+
+        res.json({
+            timestamp: frame15.timestamp,
+            stats: laneStats
+        });
+    } catch (e) {
+        res.status(500).json({ error: "타임라인 데이터를 가져오는 데 실패했습니다." });
+    }
+});
 
 app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
     let errorTracker = {};
@@ -103,6 +255,11 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
 
                     // 👥 1:1 비교를 위한 매치 전체 참가자 데이터 매핑
                     const participants = matchDetail.data.info.participants.map(p => ({
+                        participantId: p.participantId,
+                        teamId: p.teamId,
+                        individualPosition: p.individualPosition,
+                        teamPosition: p.teamPosition,
+                        lane: p.lane,
                         gameName: p.riotIdGameName || p.summonerName,
                         tagLine: p.riotIdTagline || "KR1",
                         championName: p.championName,
@@ -117,6 +274,8 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
                         visionScore: p.visionScore,
                         win: p.win
                     }));
+
+                    const laneAnalysis = await fetchLaneAnalysis(matchId, myData, matchDetail.data.info.participants);
                     
                     return {
                         matchId: matchId,
@@ -135,7 +294,8 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
                         totalMinionsKilled: myData.totalMinionsKilled + myData.neutralMinionsKilled,
                         visionScore: myData.visionScore,
                         itemIds: finalItemOrder,
-                        participants: participants
+                        participants: participants,
+                        laneAnalysis: laneAnalysis
                     };
                 } catch (e) {
                     return { matchId: matchId, error: "매치 로드 실패" };
