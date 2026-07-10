@@ -87,7 +87,7 @@
     </nav>
 
     <header class="max-w-7xl mx-auto pt-16 px-4 text-center">
-        <h2 class="text-2xl font-semibold tracking-tight text-stone-800 mb-8">전적은 가볍게, 판단은 빠르게.</h2>
+        <h2 class="text-2xl font-semibold tracking-tight text-stone-800 mb-8">소환사 전적 검색</h2>
 
         <div
             class="flex max-w-xl mx-auto bg-white rounded-lg border-2 border-stone-200 overflow-hidden shadow-sm transition-all focus-within:border-stone-800 focus-within:shadow-md mb-4">
@@ -265,8 +265,8 @@
         function getLaneResultClasses(result) {
             if (result === 'WIN') return 'bg-blue-100 text-blue-700 border-blue-200';
             if (result === 'LOSE') return 'bg-red-100 text-red-700 border-red-200';
-            if (result === 'EVEN') return 'bg-stone-100 text-stone-600 border-stone-200';
-            return 'bg-amber-100 text-amber-700 border-amber-200';
+            if (result === 'EVEN') return 'bg-zinc-100 text-zinc-700 border-zinc-200';
+            return 'bg-stone-100 text-stone-500 border-stone-200';
         }
 
         function getLaneResultText(result) {
@@ -509,12 +509,12 @@
                     const numericKda = parseFloat(match.kda);
                     let performanceBadge = `<span class="text-xs text-stone-400 font-bold">무난함</span>`;
                     if (numericKda >= 3.5 && isWin) {
-                        performanceBadge = `<span class="bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded text-[11px] font-black tracking-wide">CARRY</span>`;
+                        performanceBadge = `<span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[11px] font-black tracking-wide">CARRY</span>`;
                     } else if (numericKda < 2.0) {
                         performanceBadge = `<span class="text-xs text-stone-400/70 font-medium">아쉬움</span>`;
                     }
 
-                    const displayMode = match.gameMode === 'CLASSIC' ? '일반' : match.gameMode;
+                    const displayMode = match.gameMode === 'CLASSIC' ? '일반' : match.gameMode === 'SWIFTPLAY' ? '스위프트' : match.gameMode;
 
                     let itemHtml = '';
                     const rawItemIds = match.itemIds || [];
