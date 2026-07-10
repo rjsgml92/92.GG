@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="c41YoKPWMam_7IdCzFuxMiKz8w0Rv7_o5L-gilWWgWM" />
     <meta name="naver-site-verification" content="d48e5f3dba3e1be0317affa7548a7d220d0f1e53" />
+    <meta name="description" content="GG.92는 리그 오브 레전드 전적, 랭크, 최근 경기, 라인전 승패와 개선 조언을 간단하게 확인할 수 있는 전적 검색 서비스입니다.">
+    <link rel="canonical" href="https://rjsgml92.github.io/92.GG/">
     <title>GG.92 | 미니멀 전적 검색</title>
-    <link rel="shortcut icon" href="#">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/a.css" />
@@ -123,7 +124,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-red-600"></span>
                         <span class="text-[10px] font-black uppercase tracking-tighter">Live</span>
                     </div>
-                    <img id="profileIcon" src=""
+                    <img id="profileIcon" src="" alt="소환사 프로필 아이콘"
                         class="w-20 h-20 rounded-2xl object-cover border-2 border-stone-200 shadow-md">
                     <div>
                         <div class="flex flex-wrap items-baseline gap-x-2 mb-1.5">
@@ -139,7 +140,7 @@
                 <div class="modern-card p-6">
                     <div class="text-xs font-bold text-stone-400 uppercase tracking-wider mb-3">Ranked Solo</div>
                     <div class="flex items-center gap-5">
-                        <img id="tierIcon" src="" class="w-16 h-16 object-contain" alt="Tier Icon">
+                        <img id="tierIcon" src="" class="w-16 h-16 object-contain" alt="랭크 티어 아이콘">
                         <div>
                             <div id="tierLabel" class="text-xl font-black text-stone-900 tracking-tight">UNRANKED</div>
                             <div id="winLossDetail" class="text-sm text-stone-500 font-semibold mt-0.5">0승 0패</div>
@@ -179,11 +180,43 @@
 
     <footer class="fixed bottom-6 left-0 right-0 text-center space-x-4">
         <a href="guide.html" class="text-[10px] font-medium text-stone-400 opacity-60 hover:opacity-100 transition-opacity duration-300">전적 분석 가이드</a>
+        <a href="about.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">서비스 소개</a>
         <a href="privacy.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">개인정보처리방침</a>
         <a href="terms.html" class="text-[10px] font-medium text-stone-400 opacity-40 hover:opacity-100 transition-opacity duration-300">이용약관</a>
     </footer>
 
     <script>
+        function placeholderImage(label = 'GG') {
+            const safeLabel = String(label || 'GG').slice(0, 2).toUpperCase();
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+                    <rect width="96" height="96" rx="18" fill="#e7e5e4"/>
+                    <text x="48" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#57534e">${safeLabel}</text>
+                </svg>
+            `;
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+        }
+
+        function handleImageError(img, type = 'default') {
+            if (!img) return;
+            img.onerror = null;
+            if (type === 'item') {
+                img.remove();
+                return;
+            }
+            img.src = placeholderImage(img.dataset.fallbackLabel || 'GG');
+        }
+
+        function escapeAttribute(value) {
+            return String(value || '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
         // 🕒 최근 검색어 관리 기능
         function saveRecentSearch(name, tag) {
             let recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
@@ -387,7 +420,10 @@
                 // 성공 시 최근 검색어에 저장
                 saveRecentSearch(name, tag);
 
-                document.getElementById('profileIcon').src = data.profile.profileIconUrl;
+                const profileIcon = document.getElementById('profileIcon');
+                profileIcon.dataset.fallbackLabel = data.profile.gameName || 'GG';
+                profileIcon.onerror = () => handleImageError(profileIcon, 'profile');
+                profileIcon.src = data.profile.profileIconUrl || placeholderImage(data.profile.gameName);
                 document.getElementById('summonerLevel').innerText = `LV.${data.profile.summonerLevel}`;
                 document.getElementById('gameName').innerText = data.profile.gameName;
                 document.getElementById('tagLine').innerText = `#${data.profile.tagLine}`;
@@ -401,6 +437,8 @@
                 document.getElementById('winLossDetail').innerText = rank.wins ? `${rank.wins}승 ${rank.losses}패` : '전적 없음';
 
                 const tierImg = document.getElementById('tierIcon');
+                tierImg.dataset.fallbackLabel = rawTier === 'UNRANKED' ? 'UN' : rawTier;
+                tierImg.onerror = () => handleImageError(tierImg, 'tier');
                 if (tierFirstWord === 'unranked') {
                     tierImg.src = 'https://opgg-static.akamaized.net/images/medals_new/unranked.png';
                 } else {
@@ -430,6 +468,7 @@
 
                 const list = document.getElementById('historyList');
                 list.innerHTML = '';
+                const assetVersion = data.assetsVersion || '14.22.1';
 
                 data.history.forEach(match => {
                     const isWin = match.win;
@@ -458,10 +497,10 @@
 
                         // [변경 포인트]: onerror를 삭제하고, 데이터가 있을 때만 안전한 주소를 대입합니다.
                         if (itemId && itemId !== 0) {
-                            const opggItemUrl = `https://opgg-static.akamaized.net/meta/images/lol/latest/item/${itemId}.png`;
+                            const itemUrl = `https://ddragon.leagueoflegends.com/cdn/${assetVersion}/img/item/${itemId}.png`;
                             itemHtml += `
             <div class="w-9 h-9 rounded bg-stone-200/40 border border-stone-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                <img src="${opggItemUrl}" class="w-full h-full object-cover shadow-inner">
+                <img src="${itemUrl}" class="w-full h-full object-cover shadow-inner" alt="아이템 ${itemId}" onerror="handleImageError(this, 'item')">
             </div>`;
                         } else {
                             itemHtml += `<div class="w-9 h-9 rounded bg-stone-200/30 border border-dashed border-stone-200 shrink-0"></div>`;
@@ -481,7 +520,7 @@
                                 <div class="absolute top-0 left-0 w-1.5 h-full ${badgeClass}"></div>
 
                                 <div class="flex items-center gap-3.5 w-[160px] pl-2 shrink-0">
-                                    <img src="${match.championImageUrl}" class="w-16 h-16 rounded-full object-cover border border-stone-200 shadow-sm">
+                                    <img src="${match.championImageUrl || placeholderImage(match.championName)}" data-fallback-label="${escapeAttribute(match.championName)}" alt="${escapeAttribute(match.championName)}" onerror="handleImageError(this, 'champion')" class="w-16 h-16 rounded-full object-cover border border-stone-200 shadow-sm">
                                     <div class="leading-tight">
                                         <div class="mt-2">${laneBadge}</div>
                                         <div class="text-base font-extrabold ${isWin ? 'text-win' : 'text-lose'}">${winLabel}</div>
