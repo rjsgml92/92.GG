@@ -238,6 +238,79 @@
             return '판정 불가';
         }
 
+        function formatSigned(value, suffix = '') {
+            const number = Number(value || 0);
+            const sign = number > 0 ? '+' : '';
+            return `${sign}${number.toLocaleString()}${suffix}`;
+        }
+
+        function getLaneAdvice(analysis) {
+            if (!analysis || analysis.result === 'UNKNOWN') {
+                return '라인 정보가 부족한 게임입니다. 솔랭/자유랭처럼 포지션 정보가 안정적인 게임에서 더 정확하게 판정됩니다.';
+            }
+
+            const goldDiff = Number(analysis.goldDiff || 0);
+            const csDiff = Number(analysis.csDiff || 0);
+            const xpDiff = Number(analysis.xpDiff || 0);
+
+            if (analysis.result === 'WIN') {
+                if (goldDiff >= 700) return '라인전에서 만든 골드 차이가 큽니다. 다음 게임도 이득을 낸 뒤 전령, 용, 시야 장악으로 빠르게 굴리는 흐름을 유지하세요.';
+                if (csDiff >= 12) return 'CS 관리가 좋았습니다. 라인 주도권을 잡은 뒤 귀환 타이밍과 로밍 타이밍을 더 깔끔하게 잡으면 이득이 더 커집니다.';
+                return '라인전은 이겼습니다. 다만 차이가 압도적이진 않으니, 무리한 교전보다 안정적으로 주도권을 팀 이득으로 연결하는 게 좋습니다.';
+            }
+
+            if (analysis.result === 'LOSE') {
+                if (goldDiff <= -700) return '골드 차이가 크게 벌어졌습니다. 초반 교전보다 웨이브 손실을 줄이고, 불리할 때는 시야 없이 긴 라인을 밀지 않는 쪽이 좋습니다.';
+                if (csDiff <= -12) return 'CS 손실이 컸습니다. 라인전 초반에는 딜교보다 막타와 웨이브 위치를 우선해서 성장 차이를 줄이는 게 핵심입니다.';
+                if (xpDiff <= -800) return '경험치 차이가 큽니다. 죽거나 귀환한 뒤 미니언 웨이브를 놓친 구간이 있었을 가능성이 높습니다. 복귀 타이밍을 먼저 점검하세요.';
+                return '라인전은 밀렸지만 차이는 복구 가능한 수준입니다. 다음 게임은 초반 10분 동안 데스 최소화와 안정적인 CS 수급을 우선하세요.';
+            }
+
+            if (Math.abs(goldDiff) < 250 && Math.abs(csDiff) < 8) {
+                return '라인전은 거의 반반입니다. 이런 게임은 첫 로밍, 합류, 오브젝트 판단이 승패를 가르는 경우가 많습니다.';
+            }
+
+            return '지표가 엇갈려서 반반으로 판정했습니다. 골드, CS, 경험치 중 어느 항목이 뒤처졌는지 보고 다음 게임의 우선순위를 정하세요.';
+        }
+
+        function buildLaneReason(match) {
+            const analysis = match.laneAnalysis;
+            if (!analysis) {
+                return `
+                    <div class="text-xs text-stone-500 leading-relaxed">
+                        이 게임은 라인전 데이터를 받지 못했습니다.
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div class="rounded-md bg-white border border-stone-200 px-3 py-2">
+                        <div class="text-[10px] font-black text-stone-400 uppercase">Gold</div>
+                        <div class="text-sm font-black ${analysis.goldDiff > 0 ? 'text-win' : analysis.goldDiff < 0 ? 'text-lose' : 'text-stone-700'}">${formatSigned(analysis.goldDiff, 'G')}</div>
+                    </div>
+                    <div class="rounded-md bg-white border border-stone-200 px-3 py-2">
+                        <div class="text-[10px] font-black text-stone-400 uppercase">CS</div>
+                        <div class="text-sm font-black ${analysis.csDiff > 0 ? 'text-win' : analysis.csDiff < 0 ? 'text-lose' : 'text-stone-700'}">${formatSigned(analysis.csDiff)}</div>
+                    </div>
+                    <div class="rounded-md bg-white border border-stone-200 px-3 py-2">
+                        <div class="text-[10px] font-black text-stone-400 uppercase">XP</div>
+                        <div class="text-sm font-black ${analysis.xpDiff > 0 ? 'text-win' : analysis.xpDiff < 0 ? 'text-lose' : 'text-stone-700'}">${formatSigned(analysis.xpDiff)}</div>
+                    </div>
+                </div>
+                <div class="mt-3 text-xs font-semibold text-stone-600 leading-relaxed">${analysis.detail || '15분 시점의 골드, CS, 경험치를 기준으로 판정했습니다.'}</div>
+                <div class="mt-3 rounded-md bg-stone-50 border border-stone-200 px-3 py-2 text-xs text-stone-700 leading-relaxed">
+                    <span class="font-black text-stone-900">조언</span> ${getLaneAdvice(analysis)}
+                </div>
+            `;
+        }
+
+        function toggleLaneReason(matchId) {
+            const panel = document.getElementById(`lane-reason-${matchId}`);
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+        }
+
         async function fetchMatchHistory() {
             const nameInput = document.getElementById('summonerName');
             const tagInput = document.getElementById('tagLineInput');
@@ -354,14 +427,14 @@
                     }
 
                    
-                    // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인 (클릭 시 1:1 비교 영역 확장)
+                    // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인
                     const laneBadge = match.laneAnalysis
-                        ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis.result)}">라인전 ${match.laneAnalysis.label}</span>`
-                        : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses('UNKNOWN')}">라인전 판정 불가</span>`;
+                        ? `<button type="button" onclick="toggleLaneReason('${match.matchId}')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis.result)} hover:brightness-95 transition">라인전 ${match.laneAnalysis.label}</button>`
+                        : `<button type="button" onclick="toggleLaneReason('${match.matchId}')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses('UNKNOWN')} hover:brightness-95 transition">라인전 판정 불가</button>`;
+                    const laneReason = buildLaneReason(match);
 
                     const card = `
                         <div class="modern-card relative overflow-hidden transition-all duration-300">
-                            <!-- 메인 카드 정보 (클릭 시 비교 토글) -->
                             <div class="p-2.5 flex items-center justify-start gap-1 md:min-h-[120px] hover:bg-stone-50/40 relative">
                                 <div class="absolute top-0 left-0 w-1.5 h-full ${badgeClass}"></div>
 
@@ -398,6 +471,9 @@
                                     ${itemHtml}
                                 </div>
 
+                            </div>
+                            <div id="lane-reason-${match.matchId}" class="hidden border-t border-stone-200/60 bg-[#faf9f6]/90 px-4 py-3">
+                                ${laneReason}
                             </div>
                         </div>
                     `;
