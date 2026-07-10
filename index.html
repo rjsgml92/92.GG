@@ -276,6 +276,12 @@
             return '판정 불가';
         }
 
+        function getLaneBadgeText(analysis) {
+            if (!analysis) return '라인전 판정 불가';
+            if (analysis.result === 'UNKNOWN' && analysis.label === '라인전 없음') return '라인전 없음';
+            return `라인전 ${analysis.label || getLaneResultText(analysis.result)}`;
+        }
+
         function formatSigned(value, suffix = '') {
             const number = Number(value || 0);
             const sign = number > 0 ? '+' : '';
@@ -531,9 +537,7 @@
 
                    
                     // 🎨 시원하게 일렬로 뻗어 나가는 오리지널 슬림 전적 카드 디자인
-                    const laneBadge = match.laneAnalysis
-                        ? `<button type="button" onclick="toggleLaneReason('${match.matchId}')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis.result)} hover:brightness-95 transition">라인전 ${match.laneAnalysis.label}</button>`
-                        : `<button type="button" onclick="toggleLaneReason('${match.matchId}')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses('UNKNOWN')} hover:brightness-95 transition">라인전 판정 불가</button>`;
+                    const laneBadge = `<button type="button" onclick="toggleLaneReason('${match.matchId}')" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black border ${getLaneResultClasses(match.laneAnalysis?.result || 'UNKNOWN')} hover:brightness-95 transition">${getLaneBadgeText(match.laneAnalysis)}</button>`;
                     const laneReason = buildLaneReason(match);
 
                     const card = `
