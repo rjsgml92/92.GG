@@ -10,6 +10,10 @@ app.use(cors());
 app.use(express.json({ limit: '100kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
 const DDRAGON_VERSION = process.env.DDRAGON_VERSION || "16.15.1";
 
