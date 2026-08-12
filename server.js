@@ -1,13 +1,17 @@
 ﻿// server.js
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const axios = require('axios');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(cors());
+app.use(express.json({ limit: '100kb' }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
-const DDRAGON_VERSION = "14.22.1"; 
+const DDRAGON_VERSION = process.env.DDRAGON_VERSION || "16.15.1";
 
 const LANE_SLOT_ORDER = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
 
@@ -370,6 +374,7 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
         }
 
         res.json({
+            assetsVersion: DDRAGON_VERSION,
             errors: Object.keys(errorTracker).length > 0 ? errorTracker : "None",
             profile: {
                 gameName: accountResponse.data.gameName,
@@ -387,9 +392,23 @@ app.get('/api/summoner/:gameName/:tagLine', async (req, res) => {
     }
 });
 
+// 별도 AI 경기 평가 페이지용 API
+const evaluationRouter = require('./evaluation');
+app.use('/api/evaluation', evaluationRouter);
+
+app.use((error, req, res, next) => {
+    console.error('[unhandled]', error);
+    if (res.headersSent) return next(error);
+    res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', message: '서버 요청 처리 중 오류가 발생했습니다.' });
+});
+
 // 기존: app.listen(3000, () => { ... })
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

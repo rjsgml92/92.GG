@@ -1,14 +1,19 @@
 // test.js
 const axios = require('axios');
 
-// 1. 너의 개인 API 키 세팅
-const RIOT_API_KEY = "RGAPI-36321dd8-4272-4679-bc19-59415c97c8b9";
+// API 키는 코드에 적지 말고 환경 변수로 설정하세요.
+const RIOT_API_KEY = process.env.RIOT_API_KEY;
 
 // 2. 대한민국에서 가장 확실하게 존재하는 계정 (페이커 선수 닉네임)으로 테스트
 const gameName = encodeURIComponent("Hide on bush");
 const tagLine = encodeURIComponent("KR1");
 
 async function checkMyAPI() {
+    if (!RIOT_API_KEY) {
+        console.log('RIOT_API_KEY 환경 변수를 먼저 설정해 주세요.');
+        process.exitCode = 1;
+        return;
+    }
     console.log("=== 라이엇 API 키 작동 여부 테스트 시작 ===");
     try {
         // 아시아 서버에 페이커 선수 정보 요청
