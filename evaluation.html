@@ -82,21 +82,14 @@
         </header>
 
         <section class="card p-4 sm:p-5">
-            <form id="searchForm" class="grid grid-cols-1 sm:grid-cols-[150px_1fr_120px_auto] gap-2">
-                <label class="sr-only" for="platform">서버</label>
-                <select id="platform" class="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-bold focus:border-stone-700 focus:outline-none">
-                    <option value="euw1">유럽 서부 (EUW)</option>
-                    <option value="eun1">유럽 북동부 (EUNE)</option>
-                    <option value="kr">한국 (KR)</option>
-                    <option value="na1">북미 (NA)</option>
-                    <option value="jp1">일본 (JP)</option>
-                </select>
+            <form id="searchForm" class="grid grid-cols-1 sm:grid-cols-[1fr_120px_auto] gap-2">
+                <input id="platform" type="hidden" value="kr">
                 <label class="sr-only" for="gameName">게임 이름</label>
                 <input id="gameName" maxlength="40" autocomplete="off" placeholder="Riot ID 게임 이름" class="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-semibold focus:border-stone-700 focus:outline-none" required>
                 <label class="sr-only" for="tagLine">태그</label>
                 <div class="flex items-center rounded-lg border border-stone-200 bg-white px-3 focus-within:border-stone-700">
                     <span class="text-stone-400 font-bold">#</span>
-                    <input id="tagLine" maxlength="20" value="EUW" class="w-full px-2 py-3 text-sm font-semibold focus:outline-none" required>
+                    <input id="tagLine" maxlength="20" value="KR1" class="w-full px-2 py-3 text-sm font-semibold focus:outline-none" required>
                 </div>
                 <button id="searchButton" class="rounded-lg bg-stone-900 px-6 py-3 text-xs font-black tracking-wider text-white hover:bg-black disabled:cursor-wait disabled:opacity-60">경기 찾기</button>
             </form>
@@ -387,11 +380,6 @@
                 elements.searchButton.disabled = false;
                 elements.searchButton.textContent = '경기 찾기';
             }
-        });
-
-        elements.platform.addEventListener('change', () => {
-            const defaultTags = { euw1: 'EUW', eun1: 'EUNE', kr: 'KR1', na1: 'NA1', jp1: 'JP1' };
-            elements.tagLine.value = defaultTags[elements.platform.value] || '';
         });
 
         elements.demoButton.addEventListener('click', async () => {

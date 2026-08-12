@@ -71,7 +71,7 @@ function evaluationRateLimit(req, res, next) {
 }
 
 function getRouting(platformValue) {
-    const platform = String(platformValue || '').toLowerCase();
+    const platform = 'kr';
     const config = PLATFORM_CONFIG[platform];
     if (!config) {
         const error = new Error('지원하지 않는 서버입니다.');
