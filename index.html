@@ -423,7 +423,7 @@
             skeleton.classList.remove('hidden');
 
             try {
-                const response = await fetch(`https://nine2-gg.onrender.com/api/summoner/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`);
+                const response = await fetch(`/api/summoner/${encodeURIComponent(name)}/${encodeURIComponent(tag)}`);
                 const data = await response.json();
 
                 if (data.error) {
