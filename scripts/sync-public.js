@@ -6,6 +6,8 @@ const publicDir = path.join(root, 'public');
 const files = [
     'index.html',
     'evaluation.html',
+    'evaluation.css',
+    'evaluation-client.js',
     'about.html',
     'guide.html',
     'privacy.html',

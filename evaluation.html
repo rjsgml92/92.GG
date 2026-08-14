@@ -4,405 +4,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Riot API 경기 데이터와 타임라인을 바탕으로 최근 리그 오브 레전드 경기를 AI 코칭 형식으로 평가합니다.">
+    <meta name="description" content="Riot API 경기 데이터와 타임라인을 근거로 한 판의 흐름, 강점, 복기 구간과 다음 게임의 측정 가능한 목표를 제안합니다.">
     <link rel="canonical" href="https://rjsgml92.github.io/92.GG/evaluation.html">
-    <title>AI 경기 평가 | GG.92</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css">
-    <style>
-        body {
-            font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            background:
-                linear-gradient(90deg, rgba(255,252,244,.88), rgba(255,252,244,.78)),
-                url('background.png') center / cover fixed no-repeat;
-            color: #26231e;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            opacity: .18;
-            background-image: repeating-linear-gradient(0deg, transparent 0 5px, rgba(80,64,43,.09) 6px);
-            mix-blend-mode: multiply;
-        }
-
-        .card {
-            position: relative;
-            background: rgba(255, 252, 244, .94);
-            border: 1px solid rgba(71, 57, 40, .16);
-            border-radius: 5px;
-            box-shadow: 0 12px 32px rgba(67, 48, 30, .09);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 20px; right: 20px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #9d2d2d 15%, #9d2d2d 85%, transparent);
-            opacity: .76;
-        }
-
-        .score-ring {
-            background: conic-gradient(#9d2d2d calc(var(--score) * 1%), #ddd4c6 0);
-        }
-
-        .timeline-item { border-left: 1px solid #d8cdbb; }
-        .timeline-item::before { content: ''; display: block; width: 9px; height: 9px; margin-left: -5px; margin-top: 4px; border-radius: 50%; background: #9d2d2d; box-shadow: 0 0 0 3px #fffaf0; }
-
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .rise { animation: rise .35s ease-out both; }
-    </style>
+    <title>AI 경기 리포트 | GG.92</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="evaluation.css">
+    <script src="evaluation-client.js" defer></script>
 </head>
 
-<body class="min-h-screen flex flex-col antialiased">
-    <nav class="border-b border-stone-200 px-4 sm:px-8 py-4 bg-[#f8f6f2]/95 sticky top-0 z-50 shadow-sm backdrop-blur">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <a href="index.html" class="text-2xl font-black tracking-tighter text-stone-900">GG<span class="text-[#9d2d2d]">.</span>92</a>
-            <div class="flex items-center gap-4">
-                <span class="hidden sm:inline text-[10px] font-bold tracking-[.2em] text-stone-400 uppercase">Post-game coach</span>
-                <a href="index.html" class="text-xs font-bold text-stone-500 hover:text-stone-900">전적 검색</a>
+<body>
+    <a class="skip-link" href="#mainContent">본문으로 바로가기</a>
+
+    <nav class="site-nav" aria-label="주요 메뉴">
+        <div class="nav-inner">
+            <a href="index.html" class="brand" aria-label="GG.92 홈">GG<span class="brand-dot">.</span>92</a>
+            <div class="nav-links">
+                <span class="nav-kicker">Post-game review lab</span>
+                <a href="index.html" class="nav-link">전적 검색</a>
             </div>
         </div>
     </nav>
 
-    <main class="w-full max-w-6xl mx-auto px-4 py-10 sm:py-14 flex-1">
-        <header class="max-w-3xl mb-8">
-            <div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-[11px] font-black text-blue-700 mb-4">
-                BETA · 오분마다 읽는 경기 흐름
+    <main id="mainContent" class="page-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Evidence-based review · Beta</p>
+                <h1>한 판을 점수가 아닌<br><em>다음 행동</em>으로 바꿉니다.</h1>
+                <p class="hero-copy">최근 경기를 고르면 동일 포지션 상대와의 5분 단위 격차, 교전·성장·시야 지표를 함께 읽습니다. 잘한 이유와 놓친 구간, 다음 게임에서 확인할 한 가지 목표까지 근거와 함께 정리합니다.</p>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-stone-900">한 판의 흐름을, 오분씩</h1>
-            <p class="mt-3 text-sm sm:text-base text-stone-600 leading-relaxed">최근 경기 하나를 선택하면 5분 단위 성장 흐름과 전투·시야 지표를 차분히 읽어, 잘한 점과 다음 판의 목표를 정리합니다.</p>
+            <aside class="principle-card" aria-label="평가 원칙">
+                <p class="principle-label">SCORING PRINCIPLE</p>
+                <p class="principle-title">승패는 점수에 넣지 않습니다.</p>
+                <p class="principle-copy">한 경기의 결과보다 그 안에서 확인되는 퍼포먼스를 봅니다. AI는 고정된 점수를 바꾸지 않고, 수치의 의미와 복기 행동만 설명합니다.</p>
+                <div class="principle-row">
+                    <span>초반 · 자원 · 교전 · 생존/시야</span>
+                    <span>4개 축</span>
+                </div>
+            </aside>
         </header>
 
-        <section class="card p-4 sm:p-5">
-            <form id="searchForm" class="grid grid-cols-1 sm:grid-cols-[1fr_120px_auto] gap-2">
+        <section class="paper-card search-card" aria-labelledby="searchTitle">
+            <h2 id="searchTitle" class="sr-only">Riot ID로 최근 경기 찾기</h2>
+            <form id="searchForm" class="search-form">
                 <input id="platform" type="hidden" value="kr">
-                <label class="sr-only" for="gameName">게임 이름</label>
-                <input id="gameName" maxlength="40" autocomplete="off" placeholder="Riot ID 게임 이름" class="rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-semibold focus:border-stone-700 focus:outline-none" required>
-                <label class="sr-only" for="tagLine">태그</label>
-                <div class="flex items-center rounded-lg border border-stone-200 bg-white px-3 focus-within:border-stone-700">
-                    <span class="text-stone-400 font-bold">#</span>
-                    <input id="tagLine" maxlength="20" value="KR1" class="w-full px-2 py-3 text-sm font-semibold focus:outline-none" required>
+                <div class="field">
+                    <label for="gameName">게임 이름</label>
+                    <input id="gameName" maxlength="40" autocomplete="off" placeholder="예: Hide on bush" required>
                 </div>
-                <button id="searchButton" class="rounded-lg bg-stone-900 px-6 py-3 text-xs font-black tracking-wider text-white hover:bg-black disabled:cursor-wait disabled:opacity-60">경기 찾기</button>
+                <div class="field tag-field">
+                    <label for="tagLine">태그</label>
+                    <span class="tag-prefix" aria-hidden="true">#</span>
+                    <input id="tagLine" maxlength="20" value="KR1" autocomplete="off" required>
+                </div>
+                <button id="searchButton" class="primary-button" type="submit">최근 경기 찾기</button>
             </form>
-            <p id="searchStatus" class="hidden mt-3 text-xs font-semibold" role="status"></p>
-            <div class="mt-4 pt-4 border-t border-stone-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <p class="text-[11px] text-stone-400">Riot 키 없이도 Gemini SDK 연결부터 확인할 수 있습니다.</p>
-                <button id="demoButton" type="button" class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-[11px] font-black text-blue-700 hover:bg-blue-100 disabled:opacity-50">AI 데모 실행</button>
+            <p id="searchStatus" class="status-message hidden" role="status" aria-live="polite"></p>
+            <div class="search-lower">
+                <p class="search-note">실제 닉네임 없이도 샘플 경기로 전체 리포트를 먼저 확인할 수 있습니다.</p>
+                <button id="demoButton" type="button" class="secondary-button">샘플 리포트 보기</button>
             </div>
         </section>
 
-        <section id="profileSection" class="hidden mt-8 rise">
-            <div class="flex items-center gap-4 mb-4">
-                <img id="profileIcon" class="w-14 h-14 rounded-xl border border-stone-200 bg-stone-100" alt="프로필 아이콘">
+        <section id="profileSection" class="section-block hidden" aria-labelledby="matchPickerTitle">
+            <div class="section-heading">
+                <div class="profile-strip">
+                    <img id="profileIcon" class="profile-icon" alt="소환사 프로필 아이콘">
+                    <div>
+                        <h2 id="profileName" class="profile-name"></h2>
+                        <p id="profileMeta" class="profile-meta"></p>
+                    </div>
+                </div>
                 <div>
-                    <h2 id="profileName" class="text-xl font-black text-stone-900"></h2>
-                    <p id="profileMeta" class="text-xs font-bold text-stone-400 mt-1"></p>
+                    <h3 id="matchPickerTitle">복기할 경기 선택</h3>
+                    <p>최근 5경기 중 한 판을 선택하세요.</p>
                 </div>
+                <span id="aiAvailability" class="source-availability"></span>
             </div>
-            <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-black text-stone-700">최근 경기 선택</h3>
-                <span id="aiAvailability" class="text-[11px] font-bold"></span>
-            </div>
-            <div id="matchList" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            <div id="matchList" class="match-grid"></div>
         </section>
 
-        <section id="analysisLoading" class="hidden card mt-8 p-8 text-center" aria-live="polite">
-            <div class="mx-auto w-9 h-9 rounded-full border-4 border-stone-200 border-t-blue-600 animate-spin"></div>
-            <p class="mt-4 text-sm font-bold text-stone-700">경기 타임라인을 읽고 평가 중입니다</p>
-            <p class="mt-1 text-xs text-stone-400">AI 사용 시 최대 30초 정도 걸릴 수 있어요.</p>
+        <section id="analysisLoading" class="paper-card loading-card hidden" aria-live="polite" aria-busy="true">
+            <div class="loader-mark" aria-hidden="true"></div>
+            <p class="loading-title">경기 흐름과 수치 근거를 맞춰 보고 있습니다.</p>
+            <p class="loading-copy">타임라인 정리 → 고정 점수 계산 → AI 코칭 문장 작성 순서로 진행됩니다.</p>
         </section>
 
-        <section id="analysisSection" class="hidden mt-8 rise" aria-live="polite">
-            <div class="card overflow-hidden">
-                <div class="p-5 sm:p-7 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center gap-5">
-                    <div id="scoreRing" class="score-ring w-24 h-24 rounded-full p-2 shrink-0" style="--score: 0">
-                        <div class="w-full h-full rounded-full bg-[#fffdfa] flex flex-col items-center justify-center">
-                            <span id="grade" class="text-3xl font-black text-stone-900"></span>
-                            <span id="score" class="text-[10px] font-black text-stone-400"></span>
+        <section id="analysisSection" class="analysis-report hidden" aria-live="polite" aria-labelledby="verdict">
+            <article>
+                <div class="report-hero">
+                    <div class="report-toolbar">
+                        <span class="report-label">GG.92 · MATCH REVIEW</span>
+                        <button id="copyReportButton" type="button" class="ghost-button">리포트 복사</button>
+                    </div>
+
+                    <div class="report-summary-grid">
+                        <div class="score-summary">
+                            <div id="scoreRing" class="score-ring" style="--score: 0" aria-label="경기 퍼포먼스 점수">
+                                <div class="score-ring-inner">
+                                    <span id="grade" class="grade"></span>
+                                    <span id="score" class="score-value"></span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="report-badges">
+                                    <span id="sourceBadge" class="source-badge"></span>
+                                    <span id="confidenceBadge" class="confidence-badge"></span>
+                                    <span id="analyzedMatch" class="analyzed-match"></span>
+                                </div>
+                                <h2 id="verdict" class="verdict"></h2>
+                                <p id="summary" class="summary"></p>
+                            </div>
                         </div>
+
+                        <aside class="focus-card" aria-labelledby="focusTitle">
+                            <p class="focus-kicker">NEXT GAME · ONE FOCUS</p>
+                            <h3 id="focusTitle" class="focus-title"></h3>
+                            <p id="focusTarget" class="focus-target"></p>
+                            <p id="focusCue" class="focus-cue"></p>
+                        </aside>
                     </div>
-                    <div class="min-w-0">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <span id="sourceBadge" class="rounded-full px-2.5 py-1 text-[10px] font-black"></span>
-                            <span id="analyzedMatch" class="text-xs font-bold text-stone-400"></span>
+                </div>
+
+                <div class="report-body">
+                    <div id="metricGrid" class="metric-grid" aria-label="핵심 경기 지표"></div>
+
+                    <section class="report-section" aria-labelledby="scorecardTitle">
+                        <div class="report-section-heading">
+                            <div>
+                                <p class="section-kicker">PERFORMANCE MAP</p>
+                                <h3 id="scorecardTitle">이번 판을 만든 네 가지 축</h3>
+                                <p class="section-description">각 점수는 같은 경기의 확인 가능한 지표만 사용합니다.</p>
+                            </div>
+                            <p id="scoreMethod" class="method-line"></p>
                         </div>
-                        <h2 id="verdict" class="mt-3 text-2xl font-black tracking-tight text-stone-900"></h2>
-                        <p id="summary" class="mt-2 text-sm leading-relaxed text-stone-600"></p>
-                    </div>
-                </div>
+                        <div id="pillarGrid" class="pillar-grid"></div>
+                    </section>
 
-                <div class="p-5 sm:p-7 border-b border-stone-100 bg-[#fbf7ed]/70">
-                    <div class="flex items-center justify-between gap-3">
-                        <h3 class="text-xs font-black tracking-wider text-[#9d2d2d] uppercase">오분 단위 흐름</h3>
-                        <span class="text-[10px] font-bold text-stone-400">골드 · CS · 라인 상대 비교</span>
-                    </div>
-                    <div id="timeline" class="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
-                </div>
+                    <section class="report-section" aria-labelledby="flowTitle">
+                        <div class="report-section-heading">
+                            <div>
+                                <p class="section-kicker">GAME FLOW</p>
+                                <h3 id="flowTitle">상대와의 골드 흐름</h3>
+                                <p class="section-description">0선 위는 동일 포지션 상대보다 앞선 구간입니다.</p>
+                            </div>
+                        </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                    <div class="p-5 sm:p-7 lg:border-r border-stone-100">
-                        <h3 class="text-xs font-black tracking-wider text-blue-700 uppercase">잘한 점</h3>
-                        <div id="strengths" class="mt-4 space-y-3"></div>
-                    </div>
-                    <div class="p-5 sm:p-7 border-t lg:border-t-0 border-stone-100">
-                        <h3 class="text-xs font-black tracking-wider text-rose-700 uppercase">개선할 점</h3>
-                        <div id="improvements" class="mt-4 space-y-3"></div>
-                    </div>
-                </div>
+                        <div class="timeline-layout">
+                            <div class="chart-panel">
+                                <div class="chart-head">
+                                    <span id="momentumLabel" class="momentum-label"></span>
+                                    <span id="momentumSummary" class="momentum-summary"></span>
+                                </div>
+                                <div id="timelineChart" class="chart-wrap"></div>
+                                <div id="timeline" class="checkpoint-row"></div>
+                            </div>
 
-                <div class="p-5 sm:p-7 border-t border-stone-100 bg-stone-50/70">
-                    <h3 class="text-xs font-black tracking-wider text-stone-500 uppercase">다음 게임 체크리스트</h3>
-                    <ol id="nextGamePlan" class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3"></ol>
-                    <div id="keyMomentsWrap" class="hidden mt-5 pt-5 border-t border-stone-200">
-                        <h3 class="text-xs font-black text-stone-500">다시 볼 구간</h3>
-                        <div id="keyMoments" class="mt-2 flex flex-wrap gap-2"></div>
-                    </div>
+                            <aside class="moment-panel" aria-labelledby="momentsTitle">
+                                <h4 id="momentsTitle" class="moment-panel-title">다시 볼 구간</h4>
+                                <p class="moment-panel-copy">수치가 크게 움직였거나 팀 이벤트와 가까운 시점입니다.</p>
+                                <div id="keyMoments" class="moment-list"></div>
+                            </aside>
+                        </div>
+                    </section>
+
+                    <section class="report-section" aria-labelledby="insightTitle">
+                        <div class="report-section-heading">
+                            <div>
+                                <p class="section-kicker">COACHING NOTES</p>
+                                <h3 id="insightTitle">근거에서 행동까지</h3>
+                                <p class="section-description">평가 문장마다 관찰된 근거와 재현할 행동을 붙였습니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="insight-grid">
+                            <div class="insight-column">
+                                <h4 class="insight-title">이어갈 강점</h4>
+                                <div id="strengths" class="insight-list"></div>
+                            </div>
+                            <div class="insight-column is-improve">
+                                <h4 class="insight-title">바꿀 한두 가지</h4>
+                                <div id="improvements" class="insight-list"></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="report-section" aria-labelledby="planTitle">
+                        <div class="report-section-heading">
+                            <div>
+                                <p class="section-kicker">NEXT MATCH ROUTINE</p>
+                                <h3 id="planTitle">다음 게임 체크리스트</h3>
+                                <p class="section-description">목표, 실행 신호, 종료 후 확인법을 한 세트로 만들었습니다.</p>
+                            </div>
+                        </div>
+                        <ol id="nextGamePlan" class="plan-grid"></ol>
+                    </section>
+
+                    <section class="report-section" aria-labelledby="methodTitle">
+                        <div class="method-card">
+                            <div>
+                                <p class="section-kicker">DATA SCOPE</p>
+                                <h3 id="methodTitle">무엇을 보고 판단했나요?</h3>
+                                <div id="coverageList" class="coverage-list"></div>
+                            </div>
+                            <p id="dataLimit" class="limit-copy"></p>
+                        </div>
+                    </section>
                 </div>
-            </div>
-            <p id="analysisNotice" class="mt-3 text-xs text-amber-700 font-semibold"></p>
-            <p id="dataLimit" class="mt-2 text-[11px] leading-relaxed text-stone-400"></p>
+            </article>
+            <p id="analysisNotice" class="analysis-notice"></p>
         </section>
     </main>
 
-    <footer class="max-w-6xl mx-auto px-4 py-8 text-center text-[10px] leading-relaxed text-stone-400">
-        <p>AI 평가는 참고용이며 실제 플레이 영상은 분석하지 않습니다.</p>
-        <p class="mt-2 max-w-3xl mx-auto">GG.92 is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
+    <footer class="site-footer">
+        <p>AI 리포트는 복기를 돕는 참고 자료이며, 한 경기만으로 장기 실력이나 티어를 판정하지 않습니다.</p>
+        <p>GG.92 is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
     </footer>
-
-    <script>
-        const API_BASE = ['localhost', '127.0.0.1'].includes(location.hostname)
-            ? 'http://localhost:3000'
-            : location.hostname.endsWith('github.io')
-                ? 'https://nine2-gg.onrender.com'
-                : '';
-
-        const state = { profile: null, matches: [], analyzing: false };
-        const elements = {
-            form: document.getElementById('searchForm'),
-            platform: document.getElementById('platform'),
-            gameName: document.getElementById('gameName'),
-            tagLine: document.getElementById('tagLine'),
-            searchButton: document.getElementById('searchButton'),
-            searchStatus: document.getElementById('searchStatus'),
-            profileSection: document.getElementById('profileSection'),
-            matchList: document.getElementById('matchList'),
-            analysisLoading: document.getElementById('analysisLoading'),
-            analysisSection: document.getElementById('analysisSection')
-        };
-        elements.demoButton = document.getElementById('demoButton');
-
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[&<>"']/g, character => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            })[character]);
-        }
-
-        function showStatus(message, type = 'error') {
-            elements.searchStatus.textContent = message;
-            elements.searchStatus.className = `mt-3 text-xs font-semibold ${type === 'error' ? 'text-rose-600' : 'text-stone-500'}`;
-        }
-
-        function clearStatus() {
-            elements.searchStatus.classList.add('hidden');
-            elements.searchStatus.textContent = '';
-        }
-
-        async function readJson(response) {
-            let data;
-            try { data = await response.json(); } catch { data = {}; }
-            if (!response.ok) throw new Error(data.message || `요청 실패 (${response.status})`);
-            return data;
-        }
-
-        function formatDate(timestamp) {
-            return new Intl.DateTimeFormat('ko-KR', { month: 'short', day: 'numeric' }).format(new Date(timestamp));
-        }
-
-        function renderMatches(data) {
-            state.profile = data.profile;
-            state.matches = data.matches || [];
-
-            document.getElementById('profileIcon').src = data.profile.profileIconUrl;
-            document.getElementById('profileName').textContent = `${data.profile.gameName} #${data.profile.tagLine}`;
-            document.getElementById('profileMeta').textContent = `${data.profile.platformLabel} · 레벨 ${data.profile.summonerLevel}`;
-            const ai = document.getElementById('aiAvailability');
-            ai.textContent = data.aiAvailable ? 'Gemini AI 사용 가능' : '현재 통계 기반 평가';
-            ai.className = `text-[11px] font-bold ${data.aiAvailable ? 'text-blue-600' : 'text-amber-600'}`;
-
-            elements.matchList.innerHTML = state.matches.map((match, index) => {
-                const resultClass = match.win ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-rose-600 bg-rose-50 border-rose-100';
-                return `
-                    <article class="card p-4 flex items-center gap-4">
-                        <img src="${escapeHtml(match.championImageUrl)}" alt="${escapeHtml(match.championName)}" class="w-14 h-14 rounded-full border border-stone-200 bg-stone-100">
-                        <div class="min-w-0 flex-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="px-2 py-0.5 rounded border text-[10px] font-black ${resultClass}">${match.win ? '승리' : '패배'}</span>
-                                <span class="text-sm font-black text-stone-900">${escapeHtml(match.championName)}</span>
-                                <span class="text-[10px] font-bold text-stone-400">${escapeHtml(match.positionLabel)}</span>
-                            </div>
-                            <p class="mt-2 text-xs font-bold text-stone-600">${match.kills} / <span class="text-rose-500">${match.deaths}</span> / ${match.assists} · CS ${match.cs} · 시야 ${match.visionScore}</p>
-                            <p class="mt-1 text-[10px] font-semibold text-stone-400">${escapeHtml(match.queue)} · ${match.durationMinutes}분 · ${formatDate(match.gameCreation)}</p>
-                        </div>
-                        <button type="button" data-index="${index}" class="analyze-button shrink-0 rounded-lg border border-stone-300 px-3 py-2 text-[11px] font-black text-stone-700 hover:bg-stone-900 hover:text-white disabled:opacity-40">평가</button>
-                    </article>`;
-            }).join('');
-
-            if (!state.matches.length) {
-                elements.matchList.innerHTML = '<div class="card p-8 text-center text-sm font-semibold text-stone-500 md:col-span-2">최근 경기를 찾지 못했습니다.</div>';
-            }
-
-            elements.matchList.querySelectorAll('.analyze-button').forEach(button => {
-                button.addEventListener('click', () => analyzeMatch(Number(button.dataset.index)));
-            });
-            elements.profileSection.classList.remove('hidden');
-        }
-
-        function renderItems(containerId, items, tone) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = (items || []).map(item => `
-                <div class="rounded-lg border border-stone-200 bg-white p-3">
-                    <div class="text-sm font-black ${tone}">${escapeHtml(item.title)}</div>
-                    <div class="mt-1 text-xs leading-relaxed text-stone-500">${escapeHtml(item.evidence)}</div>
-                </div>`).join('');
-        }
-
-        function renderTimeline(checkpoints) {
-            const container = document.getElementById('timeline');
-            const items = Array.isArray(checkpoints) ? checkpoints : [];
-            if (!items.length) {
-                container.innerHTML = '<p class="col-span-full text-xs font-semibold text-stone-400">표시할 5분 단위 타임라인이 없습니다.</p>';
-                return;
-            }
-            container.innerHTML = items.map(point => {
-                const lane = point.versusLane;
-                const goldDiff = lane?.goldDiff;
-                const diffText = lane ? `${goldDiff >= 0 ? '+' : ''}${goldDiff.toLocaleString()}G · ${lane.csDiff >= 0 ? '+' : ''}${lane.csDiff}CS` : '라인 비교 없음';
-                const diffColor = goldDiff == null ? 'text-stone-400' : goldDiff >= 0 ? 'text-[#8a5b18]' : 'text-[#9d2d2d]';
-                return `<article class="timeline-item pl-3 min-w-0">
-                    <p class="text-sm font-black text-stone-800">${point.minute}분</p>
-                    <p class="mt-1 text-[11px] font-bold text-stone-500">${point.gold.toLocaleString()}G · ${point.cs}CS</p>
-                    <p class="mt-1 text-[10px] font-black ${diffColor}">${diffText}</p>
-                </article>`;
-            }).join('');
-        }
-
-        function renderEvaluation(data) {
-            const evaluation = data.evaluation;
-            document.getElementById('scoreRing').style.setProperty('--score', evaluation.score);
-            document.getElementById('grade').textContent = evaluation.grade;
-            document.getElementById('score').textContent = `${evaluation.score} / 100`;
-            document.getElementById('verdict').textContent = evaluation.verdict;
-            document.getElementById('summary').textContent = evaluation.summary;
-            document.getElementById('analyzedMatch').textContent = `${data.match.championName} · ${data.match.kills}/${data.match.deaths}/${data.match.assists}`;
-            renderTimeline(data.checkpoints);
-
-            const source = document.getElementById('sourceBadge');
-            const isGemini = data.source === 'gemini';
-            source.textContent = isGemini ? 'GEMINI AI 평가' : '통계 기반 평가';
-            source.className = `rounded-full px-2.5 py-1 text-[10px] font-black ${isGemini ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`;
-
-            renderItems('strengths', evaluation.strengths, 'text-blue-700');
-            renderItems('improvements', evaluation.improvements, 'text-rose-700');
-            document.getElementById('nextGamePlan').innerHTML = (evaluation.nextGamePlan || []).map((item, index) => `
-                <li class="rounded-lg bg-white border border-stone-200 p-3 flex gap-3 text-xs leading-relaxed text-stone-600">
-                    <span class="w-5 h-5 shrink-0 rounded-full bg-stone-900 text-white text-[10px] font-black flex items-center justify-center">${index + 1}</span>
-                    <span>${escapeHtml(item)}</span>
-                </li>`).join('');
-
-            const keyMoments = evaluation.keyMoments || [];
-            const wrap = document.getElementById('keyMomentsWrap');
-            wrap.classList.toggle('hidden', !keyMoments.length);
-            document.getElementById('keyMoments').innerHTML = keyMoments.map(item => `<span class="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-[11px] font-bold text-stone-600">${escapeHtml(item)}</span>`).join('');
-            document.getElementById('analysisNotice').textContent = data.notice || '';
-            document.getElementById('dataLimit').textContent = evaluation.dataLimit || '';
-            elements.analysisSection.classList.remove('hidden');
-            elements.analysisSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        async function analyzeMatch(index) {
-            if (state.analyzing || !state.matches[index]) return;
-            state.analyzing = true;
-            elements.analysisSection.classList.add('hidden');
-            elements.analysisLoading.classList.remove('hidden');
-            document.querySelectorAll('.analyze-button').forEach(button => button.disabled = true);
-
-            try {
-                const response = await fetch(`${API_BASE}/api/evaluation/analyze`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        platform: state.profile.platform,
-                        gameName: state.profile.gameName,
-                        tagLine: state.profile.tagLine,
-                        matchId: state.matches[index].matchId
-                    })
-                });
-                renderEvaluation(await readJson(response));
-            } catch (error) {
-                showStatus(error.message);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } finally {
-                state.analyzing = false;
-                elements.analysisLoading.classList.add('hidden');
-                document.querySelectorAll('.analyze-button').forEach(button => button.disabled = false);
-            }
-        }
-
-        elements.form.addEventListener('submit', async event => {
-            event.preventDefault();
-            clearStatus();
-            elements.searchButton.disabled = true;
-            elements.searchButton.textContent = '불러오는 중';
-            elements.profileSection.classList.add('hidden');
-            elements.analysisSection.classList.add('hidden');
-
-            const params = new URLSearchParams({
-                platform: elements.platform.value,
-                gameName: elements.gameName.value.trim(),
-                tagLine: elements.tagLine.value.trim()
-            });
-
-            try {
-                const response = await fetch(`${API_BASE}/api/evaluation/matches?${params}`);
-                renderMatches(await readJson(response));
-            } catch (error) {
-                showStatus(error.message);
-            } finally {
-                elements.searchButton.disabled = false;
-                elements.searchButton.textContent = '경기 찾기';
-            }
-        });
-
-        elements.demoButton.addEventListener('click', async () => {
-            if (state.analyzing) return;
-            clearStatus();
-            state.analyzing = true;
-            elements.demoButton.disabled = true;
-            elements.demoButton.textContent = '평가 중';
-            elements.analysisSection.classList.add('hidden');
-            elements.analysisLoading.classList.remove('hidden');
-            try {
-                const response = await fetch(`${API_BASE}/api/evaluation/demo`, { method: 'POST' });
-                renderEvaluation(await readJson(response));
-            } catch (error) {
-                showStatus(error.message);
-            } finally {
-                state.analyzing = false;
-                elements.analysisLoading.classList.add('hidden');
-                elements.demoButton.disabled = false;
-                elements.demoButton.textContent = 'AI 데모 실행';
-            }
-        });
-    </script>
 </body>
 
 </html>

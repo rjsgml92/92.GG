@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node scripts/sync-public.js && node server.js",
-    "check": "node --check server.js && node --check evaluation.js && node --check scripts/sync-public.js",
+    "check": "node --check server.js && node --check evaluation.js && node --check evaluation-client.js && node --check scripts/sync-public.js",
+    "test:evaluation": "node scripts/verify-evaluation.js",
     "vercel-build": "node scripts/sync-public.js"
   },
   "dependencies": {
